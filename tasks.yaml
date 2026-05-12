@@ -1,0 +1,189 @@
+# ==========================================
+# 7天行动清单 - 可执行任务节点
+# 状态: pending | in_progress | done | skipped
+# 类型: manual(手动) | auto(自动) | semi(半自动)
+# ==========================================
+
+meta:
+  project: Token比价站
+  start_date: 待定
+  current_day: 1
+
+days:
+  - day: 1
+    title: 数据层 - 让脚本跑起来
+    tasks:
+      - id: "1.1"
+        name: 列10个中转站URL，确认/v1/models端点可访问
+        type: manual
+        status: done
+        time: 上午1h
+        output: 站点列表(至少8个)
+        verify: curl每个URL都能返回JSON
+
+      - id: "1.2"
+        name: 写monitor.py核心检测脚本
+        type: semi
+        status: done
+        time: 下午1h
+        output: data/stations.json
+        verify: python monitor.py 运行成功，JSON文件生成
+        deps: ["1.1"]
+
+  - day: 2
+    title: 展示层 - 让数据可见
+    tasks:
+      - id: "2.1"
+        name: 写index.html展示表格(站名/状态/延迟/时间)
+        type: semi
+        status: done
+        time: 上午1h
+        output: index.html
+        verify: 双击HTML能用浏览器打开看到表格
+
+      - id: "2.2"
+        name: 加样式美化(在线绿/异常红/延迟排序/手机适配)
+        type: semi
+        status: done
+        time: 下午0.5h
+        output: 美观的响应式页面
+        verify: 手机和电脑都能正常显示
+        deps: ["2.1"]
+
+  - day: 3
+    title: 自动化 - 让数据自己更新
+    tasks:
+      - id: "3.1"
+        name: 建GitHub仓库并推送代码
+        type: manual
+        status: pending
+        time: 上午0.5h
+        output: 公开仓库
+        verify: git push成功，仓库页面能打开
+
+      - id: "3.2"
+        name: 配GitHub Actions定时跑monitor.py
+        type: semi
+        status: pending
+        time: 下午0.5h
+        output: .github/workflows/monitor.yml
+        verify: 等10分钟看Actions自动跑成功
+        deps: ["3.1"]
+
+  - day: 4
+    title: 部署 - 让全世界能访问
+    tasks:
+      - id: "4.1"
+        name: 开GitHub Pages公网访问
+        type: manual
+        status: pending
+        time: 上午0.5h
+        output: 公网URL
+        verify: 浏览器打开 https://用户名.github.io/仓库名
+
+      - id: "4.2"
+        name: (可选)买域名并绑定
+        type: manual
+        status: pending
+        time: 下午0.5h
+        output: 自定义域名
+        verify: 域名能正常访问
+        deps: ["4.1"]
+
+  - day: 5
+    title: 引流 - 第一波用户
+    tasks:
+      - id: "5.1"
+        name: CSDN/掘金写教程文章引流
+        type: manual
+        status: pending
+        time: 上午1.5h
+        output: 1篇发布文章
+        verify: 阅读量>0
+
+      - id: "5.2"
+        name: 把文章发到微信群/Telegram群
+        type: manual
+        status: pending
+        time: 下午0.5h
+        output: 种子用户访问
+        verify: 页面有除你之外的UV
+        deps: ["5.1"]
+
+  - day: 6
+    title: 优化 - 修一轮bug
+    tasks:
+      - id: "6.1"
+        name: 检查GitHub Actions稳定性
+        type: manual
+        status: pending
+        time: 上午0.5h
+        output: 确认24h监测全成功
+        verify: Actions面板无失败记录
+
+      - id: "6.2"
+        name: 加新站点+调整排序逻辑
+        type: semi
+        status: pending
+        time: 下午0.5h
+        output: config.yaml更新
+        verify: 数据更全，排序合理
+
+  - day: 7
+    title: 变现 - 埋好收入钩子
+    tasks:
+      - id: "7.1"
+        name: 表格加"注册链接"列，放推荐码
+        type: semi
+        status: pending
+        time: 上午0.5h
+        output: 变现链路
+        verify: 点链接能跳到中转站
+
+      - id: "7.2"
+        name: 写第二篇引流文章(红黑榜)
+        type: manual
+        status: pending
+        time: 下午1h
+        output: 第2篇发布
+        verify: 阅读量>第一篇
+
+# ==========================================
+# 长期自动化任务（7天后持续运行）
+# ==========================================
+automated_tasks:
+  - id: "A1"
+    name: 中转站可用性监控
+    type: auto
+    frequency: 每10分钟
+    script: monitor.py
+    alert: 连续失败3次 → 飞书推送告警
+
+  - id: "A2"
+    name: 每日进度报告生成
+    type: auto
+    frequency: 每天21:00
+    script: daily_report.py
+    output: reports/日报_YYYY-MM-DD.md + 飞书推送
+
+  - id: "A3"
+    name: 风险预警扫描
+    type: auto
+    frequency: 每30分钟
+    checks:
+      - 任一站点延迟>3000ms
+      - 任一站点连续不可达>10分钟
+      - 3个以上站点同时异常
+    alert: 触发任一条件 → 飞书推送告警
+
+  - id: "A4"
+    name: 每周竞品动向追踪
+    type: semi
+    frequency: 每周一
+    action: 检查竞品站有没有新功能/改价 → 更新config.yaml
+
+  - id: "A5"
+    name: 文章引流(持续)
+    type: manual
+    frequency: 每月2篇
+    platforms: [CSDN, 掘金, 知乎]

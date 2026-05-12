@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Token 中转站比价监控</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:20px}
+.container{max-width:900px;margin:0 auto}
+h1{text-align:center;margin-bottom:8px;font-size:24px}
+.subtitle{text-align:center;color:#94a3b8;margin-bottom:20px;font-size:14px}
+.card{background:#1e293b;border-radius:12px;padding:20px;margin-bottom:16px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px 16px;text-align:left;border-bottom:1px solid #334155}
+th{color:#94a3b8;font-weight:500;font-size:13px}
+td{font-size:14px}
+tr:hover{background:#273548}
+.status-online{color:#4ade80}
+.status-warn{color:#fbbf24}
+.status-offline{color:#f87171}
+.latency-good{color:#4ade80}
+.latency-warn{color:#fbbf24}
+.latency-bad{color:#f87171}
+.updated{text-align:center;color:#64748b;font-size:12px;margin-top:16px}
+.alert-box{background:#7f1d1d;border:1px solid #ef4444;border-radius:8px;padding:12px;margin-bottom:16px;color:#fca5a5}
+.alert-box.warn{background:#78350f;border-color:#f59e0b;color:#fcd34d}
+a{color:#60a5fa;text-decoration:none}
+a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Token 中转站比价监控</h1>
+<p class="subtitle">每10分钟自动检测 · 公开数据 · 帮你选最快最稳的站</p>
+<div id="alerts"></div>
+<div class="card">
+<table>
+<thead><tr><th>站名</th><th>类型</th><th>状态</th><th>延迟</th><th>最后检测</th><th>注册</th></tr></thead>
+<tbody id="table-body"><tr><td colspan="6" style="text-align:center;color:#64748b">加载中...</td></tr></tbody>
+</table>
+</div>
+<p class="updated" id="update-time"></p>
+</div>
+<script>
+async function loadData(){
+  try{
+    const r=await fetch('data/stations.json');
+    const d=await r.json();
+    const tbody=document.getElementById('table-body');
+    const alerts=document.getElementById('alerts');
+
+    // 告警
+    if(d.alerts&&d.alerts.length>0){
+      alerts.innerHTML=d.alerts.map(a=>`<div class="alert-box">⚠️ ${a}</div>`).join('');
+    }else{
+      alerts.innerHTML='';
+    }
+
+    // 表格
+    tbody.innerHTML=d.stations.map(s=>{
+      let statusCls=s.status==='在线'?'status-online':(s.status.includes('超时')?'status-warn':'status-offline');
+      let statusEmoji=s.status==='在线'?'🟢':(s.status.includes('超时')?'🟡':'🔴');
+      let delay=s.delay_ms?s.delay_ms+'ms':'-';
+      let delayCls=s.delay_ms?(s.delay_ms<1000?'latency-good':(s.delay_ms<3000?'latency-warn':'latency-bad')):'';
+      let time=s.time?s.time.replace('T',' ').substring(0,19):'-';
+      let link=s.affiliate_link?`<a href="${s.affiliate_link}" target="_blank">注册→</a>`:'-';
+      return `<tr>
+        <td><strong>${statusEmoji} ${s.name}</strong></td>
+        <td>${s.type||''}</td>
+        <td class="${statusCls}">${s.status}</td>
+        <td class="${delayCls}">${delay}</td>
+        <td>${time}</td>
+        <td>${link}</td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('update-time').textContent='最后更新: '+d.updated_at.replace('T',' ').substring(0,19)+' | 数据每10分钟自动刷新';
+  }catch(e){
+    document.getElementById('table-body').innerHTML='<tr><td colspan="6" style="text-align:center;color:#f87171">数据加载失败，请稍后刷新</td></tr>';
+  }
+}
+loadData();
+setInterval(loadData,600000); // 每10分钟刷新
+</script>
+</body>
+</html>
