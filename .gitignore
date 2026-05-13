@@ -1,4 +1,3 @@
-data/*.json
 reports/*.md
 __pycache__/
 *.pyc
