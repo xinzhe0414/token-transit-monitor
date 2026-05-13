@@ -8,489 +8,355 @@
 <meta property="og:title" content="AI API 中转站比价 — 3秒找到最省钱的站">
 <meta property="og:description" content="7大中转站实时价格对比，风险分级，防跑路指南。">
 <style>
-/* ====== RESET & FONTS ====== */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 :root{
-  --bg:#080d16;
-  --bg-card:#0f1927;
-  --border:#1a2a3f;
-  --text:#e2e8f0;
-  --text2:#8899b0;
-  --text3:#4a5d7e;
-  --green:#10b981;
-  --amber:#f59e0b;
-  --red:#ef4444;
-  --accent:#6366f1;
+  --bg:#080d16;--bg2:#0f1927;--b:#1a2a3f;
+  --t:#e2e8f0;--t2:#8899b0;--t3:#4a5d7e;
+  --g:#10b981;--a:#f59e0b;--r:#ef4444;--ac:#6366f1;
   --mono:'JetBrains Mono',monospace;
   --sans:'PingFang SC','Microsoft YaHei',-apple-system,sans-serif;
-  --radius:12px;
 }
-
 html{font-size:16px;background:var(--bg)}
-body{
-  font-family:var(--sans);color:var(--text);
-  background:var(--bg);min-height:100vh;
-  -webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(ellipse 100% 50% at 50% -20%,rgba(99,102,241,0.05),transparent);
-}
+body{font-family:var(--sans);color:var(--t);background:var(--bg);min-height:100vh;-webkit-font-smoothing:antialiased;background-image:radial-gradient(ellipse 100% 60% at 50% -30%,rgba(99,102,241,0.04),transparent)}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:44px;font-size:0.75rem;color:var(--t2);border-bottom:1px solid var(--b);background:rgba(8,13,22,0.9);backdrop-filter:blur(8px);position:sticky;top:0;z-index:10}
+.bar-l{font-family:var(--mono);display:flex;align-items:center;gap:8px}
+.bar-dot{width:6px;height:6px;border-radius:50%;background:var(--g)}
+.bar-time{color:var(--t3);font-family:var(--mono);font-size:0.68rem}
+@media(max-width:640px){.bar{padding:0 12px;height:40px}.bar-time{display:none}}
 
-/* ====== TOP BAR ====== */
-.bar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;height:44px;font-size:0.75rem;color:var(--text2);
-  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;
-  background:rgba(8,13,22,0.92);backdrop-filter:blur(8px);
-}
-.bar-left{display:flex;align-items:center;gap:12px;font-family:var(--mono)}
-.bar-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(16,185,129,0.4)}
-.bar-time{color:var(--text3)}
-@media(max-width:640px){.bar{padding:0 12px;height:40px;font-size:0.7rem}.bar-time{display:none}}
+.main{max-width:960px;margin:0 auto;padding:24px 16px}
+@media(min-width:768px){.main{padding:32px 24px}}
 
-/* ====== MAIN ====== */
-.main{max-width:1100px;margin:0 auto;padding:20px}
-@media(max-width:640px){.main{padding:12px}}
-
-/* ====== HERO CARD ====== */
+/* ====== HERO ====== */
 .hero{
-  background:linear-gradient(160deg,rgba(16,185,129,0.06),rgba(99,102,241,0.04));
-  border:1px solid rgba(16,185,129,0.18);
-  border-radius:var(--radius);padding:28px 32px;margin-bottom:24px;
-  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,rgba(16,185,129,0.05),rgba(99,102,241,0.03));
+  border:1px solid rgba(16,185,129,0.15);border-radius:14px;
+  padding:32px;margin-bottom:24px;position:relative;overflow:hidden;
 }
-.hero::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(16,185,129,0.5),rgba(99,102,241,0.3),transparent);
-}
-.hero-label{
-  font-family:var(--mono);font-size:0.65rem;letter-spacing:2px;
-  color:var(--green);text-transform:uppercase;margin-bottom:8px;
-}
-.hero-name{
-  font-size:1.6rem;font-weight:700;margin-bottom:8px;letter-spacing:-0.3px;
-}
-.hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.hero-tag{
-  font-size:0.72rem;padding:4px 12px;border-radius:20px;font-weight:500;
-}
-.hero-tag.safe{background:rgba(16,185,129,0.1);color:var(--green)}
-.hero-tag.pay{background:rgba(99,102,241,0.08);color:#a5b4fc}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(16,185,129,0.6),rgba(99,102,241,0.3),transparent)}
+.hero-label{font-family:var(--mono);font-size:0.62rem;letter-spacing:2.5px;color:var(--g);text-transform:uppercase;margin-bottom:8px}
+.hero-row{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.hero-info{flex:1;min-width:0}
+.hero-name{font-size:1.4rem;font-weight:700;margin-bottom:6px;letter-spacing:-0.3px}
+.hero-meta{font-size:0.75rem;color:var(--t2);margin-bottom:14px}
+.hero-meta span{display:inline-block;margin-right:10px}
 
-/* The money part - should be the biggest thing */
-.hero-price-block{
-  background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.12);
-  border-radius:10px;padding:20px 24px;margin-bottom:16px;
-}
-.hero-model-label{font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-.hero-price-row{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
-.hero-price{
-  font-family:var(--mono);font-size:2.2rem;font-weight:700;
-  color:#34d399;
-}
-.hero-price-unit{font-family:var(--mono);font-size:0.75rem;color:var(--text3)}
-.hero-save{
-  font-family:var(--mono);font-size:1rem;font-weight:600;color:var(--green);
-  background:rgba(16,185,129,0.08);padding:6px 14px;border-radius:20px;
-}
-.hero-compare{display:flex;gap:8px;font-size:0.75rem;color:var(--text2);margin-top:8px}
-.hero-compare span{color:var(--text3);text-decoration:line-through}
+.hero-price-box{background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.1);border-radius:10px;padding:18px 20px;margin-bottom:12px}
+.hero-price-label{font-size:0.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.hero-price-row{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.hero-price{font-family:var(--mono);font-size:2.4rem;font-weight:700;color:var(--g);line-height:1}
+.hero-price-sub{font-family:var(--mono);font-size:0.7rem;color:var(--t3)}
+.hero-save{font-family:var(--mono);font-size:0.9rem;font-weight:600;color:var(--g);background:rgba(16,185,129,0.08);padding:5px 14px;border-radius:20px}
+.hero-vs{font-size:0.7rem;color:var(--t3);margin-top:6px}
+.hero-vs em{font-style:normal;text-decoration:line-through;margin:0 4px}
 
-.hero-foot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.hero-meta{font-size:0.72rem;color:var(--text2);display:flex;gap:16px;flex-wrap:wrap}
-.hero-cta{
-  background:linear-gradient(135deg,var(--green),#059669);color:#fff;border:none;
-  padding:12px 32px;border-radius:8px;font-size:0.9rem;font-weight:700;cursor:pointer;
-  text-decoration:none;display:inline-block;transition:all 0.2s;
-  box-shadow:0 4px 20px rgba(16,185,129,0.25);
-}
-.hero-cta:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(16,185,129,0.35)}
+.hero-cta{background:linear-gradient(135deg,var(--g),#059669);color:#fff;padding:13px 36px;border-radius:8px;font-size:0.9rem;font-weight:700;text-decoration:none;display:inline-block;transition:all 0.2s;box-shadow:0 4px 20px rgba(16,185,129,0.2);white-space:nowrap}
+.hero-cta:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(16,185,129,0.3)}
+@media(max-width:640px){.hero{padding:20px}.hero-name{font-size:1.15rem}.hero-price{font-size:1.8rem}.hero-cta{width:100%;text-align:center;margin-top:12px}}
 
-@media(max-width:640px){
-  .hero{padding:20px}
-  .hero-name{font-size:1.3rem}
-  .hero-price{font-size:1.8rem}
-  .hero-cta{width:100%;text-align:center}
-}
+/* ====== CURRENCY ====== */
+.cur{display:flex;justify-content:flex-end;margin-bottom:16px;gap:0}
+.cur-btn{background:none;border:1px solid var(--b);color:var(--t3);font-family:var(--mono);font-size:0.65rem;padding:6px 16px;cursor:pointer;transition:all 0.15s}
+.cur-btn:first-child{border-radius:6px 0 0 6px}.cur-btn:last-child{border-radius:0 6px 6px 0}
+.cur-btn.on{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--g)}
 
-/* ====== SECTION TITLE ====== */
-.sec-title{
-  font-family:var(--mono);font-size:0.75rem;color:var(--text3);
-  text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;
-  display:flex;align-items:center;gap:8px;
+/* ====== QUICK LIST (top 3) ====== */
+.quick-title{font-family:var(--mono);font-size:0.7rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.quick-list{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.quick-row{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 16px;background:var(--bg2);border:1px solid var(--b);border-radius:8px;
+  font-size:0.8rem;transition:all 0.15s;text-decoration:none;color:inherit;cursor:pointer;
 }
-.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.quick-row:hover{background:rgba(255,255,255,0.02)}
+.quick-row.best{border-color:rgba(16,185,129,0.2);background:rgba(16,185,129,0.02)}
+.quick-row.best::after{content:'🥇 推荐';font-size:0.6rem;color:var(--g);font-family:var(--mono)}
+.quick-left{display:flex;align-items:center;gap:10px}
+.quick-name{font-weight:600}
+.quick-risk{font-size:0.75rem}
+.quick-right{display:flex;align-items:center;gap:14px}
+.quick-price{font-family:var(--mono);font-weight:600}
+.quick-price.low{color:var(--g)}
+.quick-save{font-family:var(--mono);font-size:0.68rem;color:var(--g)}
 
-/* ====== COMPARISON TABLE ====== */
-.cmp-table{
-  width:100%;border-collapse:collapse;font-size:0.8rem;
-  background:var(--bg-card);border-radius:var(--radius);overflow:hidden;
-  border:1px solid var(--border);
+/* ====== BUTTON: VIEW ALL ====== */
+.btn-more{
+  display:block;width:100%;padding:14px;text-align:center;
+  background:var(--bg2);border:1px dashed var(--b);border-radius:10px;
+  color:var(--t2);font-family:var(--mono);font-size:0.75rem;cursor:pointer;
+  transition:all 0.2s;margin-bottom:16px;
 }
-.cmp-table th{
-  font-family:var(--mono);font-size:0.62rem;font-weight:500;color:var(--text3);
-  text-transform:uppercase;letter-spacing:0.8px;text-align:left;
-  padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02);
-}
-.cmp-table td{padding:12px 16px;border-bottom:1px solid rgba(26,42,63,0.5);vertical-align:middle}
-.cmp-table tr:last-child td{border-bottom:none}
-.cmp-table tr:hover td{background:rgba(255,255,255,0.015)}
-.cmp-table tr.best td{background:rgba(16,185,129,0.03)}
-.cmp-table tr.best td:first-child{border-left:3px solid var(--green)}
-.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius)}
+.btn-more:hover{background:rgba(255,255,255,0.02);border-color:var(--ac);color:var(--t)}
+.btn-more.open{border-style:solid;border-color:var(--b);margin-bottom:20px}
 
-.price-num{font-family:var(--mono);font-weight:600}
-.price-num.low{color:var(--green)}
-.save-num{font-family:var(--mono);font-size:0.72rem;font-weight:600}
-.save-num.good{color:var(--green)}
-.save-num.ok{color:var(--amber)}
+/* ====== FULL TABLE (hidden by default) ====== */
+.full-view{display:none}
+.full-view.show{display:block;animation:in 0.3s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 
-.pay-badge{
-  display:inline-block;font-size:0.62rem;padding:2px 8px;border-radius:10px;
-  background:rgba(255,255,255,0.04);margin-right:4px;color:var(--text2);
-}
-.cta-sm{
-  font-family:var(--mono);font-size:0.65rem;color:var(--accent);text-decoration:none;
-  padding:5px 14px;border:1px solid var(--border);border-radius:6px;white-space:nowrap;
-  transition:all 0.15s;display:inline-block;
-}
-.cta-sm:hover{background:rgba(99,102,241,0.08);border-color:var(--accent)}
+.tbl-title{font-family:var(--mono);font-size:0.7rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;border:1px solid var(--b);margin-bottom:12px}
+table{width:100%;border-collapse:collapse;background:var(--bg2);font-size:0.78rem;min-width:680px}
+th{font-family:var(--mono);font-size:0.6rem;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:0.8px;text-align:left;padding:9px 14px;border-bottom:1px solid var(--b);background:rgba(255,255,255,0.01)}
+td{padding:10px 14px;border-bottom:1px solid rgba(26,42,63,0.4);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,0.01)}
+tr.row-best td{background:rgba(16,185,129,0.02)}
+tr.row-best td:first-child{border-left:3px solid var(--g)}
+.pn{font-family:var(--mono);font-weight:600}.pn.green{color:var(--g)}
+.sn{font-family:var(--mono);font-size:0.7rem;font-weight:600}.sn.good{color:var(--g)}.sn.ok{color:var(--a)}
+.pb{font-size:0.6rem;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,0.03);margin-right:3px;color:var(--t2)}
+.lk{font-family:var(--mono);font-size:0.62rem;color:var(--ac);text-decoration:none;padding:4px 11px;border:1px solid var(--b);border-radius:5px;white-space:nowrap;transition:all 0.15s;display:inline-block}
+.lk:hover{background:rgba(99,102,241,0.06);border-color:var(--ac)}
 
-/* ====== MONITOR GRID (compact) ====== */
-.mon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-.mon-card{
-  background:var(--bg-card);border:1px solid var(--border);
-  border-radius:8px;padding:12px 14px;
+/* ====== NAV CARDS (bottom) ====== */
+.nav-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.nav-card{
+  display:block;padding:20px;background:var(--bg2);border:1px solid var(--b);
+  border-radius:10px;color:var(--t);text-decoration:none;transition:all 0.2s;text-align:center;
 }
-.mon-card .n{font-weight:600;font-size:0.78rem;margin-bottom:4px}
-.mon-card .s{font-family:var(--mono);font-size:0.65rem}
-.mon-card .s.on{color:var(--green)}
-.mon-card .s.off{color:var(--red)}
-.mon-card .s.warn{color:var(--amber)}
-.mon-card .m{font-family:var(--mono);font-size:0.62rem;color:var(--text3);margin-top:4px}
+.nav-card:hover{background:rgba(255,255,255,0.02);border-color:var(--ac)}
+.nav-card .icon{font-size:1.5rem;margin-bottom:6px}
+.nav-card .label{font-size:0.78rem;font-weight:600}
+.nav-card .sub{font-size:0.65rem;color:var(--t3);margin-top:2px}
+@media(max-width:640px){.nav-cards{grid-template-columns:repeat(3,1fr);gap:6px}.nav-card{padding:14px 8px}.nav-card .label{font-size:0.7rem}}
 
-/* ====== ALERTS ====== */
-.alert{font-family:var(--mono);font-size:0.65rem;padding:6px 12px;border-radius:6px;margin-bottom:4px}
-.alert.crit{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);color:#fca5a5}
-.alert.warn{background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.12);color:#fcd34d}
+/* ====== DETAIL SECTIONS ====== */
+.detail{display:none;margin-top:16px}
+.detail.show{display:block;animation:in 0.3s ease-out}
 
-/* ====== GUIDE CARDS ====== */
-.guide-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.guide{
-  background:var(--bg-card);border:1px solid var(--border);
-  border-radius:var(--radius);padding:20px;
-}
-.guide h3{font-family:var(--mono);font-size:0.78rem;color:var(--accent);margin-bottom:10px}
-.guide p,.guide li{font-size:0.75rem;color:var(--text2);line-height:1.8}
-.guide ul{padding-left:16px}
-.guide pre{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;overflow-x:auto;margin:8px 0}
-.guide code{font-family:var(--mono);font-size:0.65rem;color:var(--green);line-height:1.8}
-@media(max-width:768px){
-  .guide-wrap{display:flex;overflow-x:auto;gap:10px;scroll-snap-type:x mandatory;scrollbar-width:none}
-  .guide-wrap::-webkit-scrollbar{display:none}
-  .guide{min-width:270px;scroll-snap-align:start}
-}
+.alert-item{font-family:var(--mono);font-size:0.62rem;padding:5px 10px;border-radius:5px;margin-bottom:3px}
+.alert-item.crit{background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.12);color:#fca5a5}
+.alert-item.warn{background:rgba(245,158,11,0.04);border:1px solid rgba(245,158,11,0.1);color:#fcd34d}
 
-/* ====== FAQ ====== */
-.faq-item{border-bottom:1px solid var(--border);cursor:pointer}
-.faq-q{font-weight:600;font-size:0.82rem;padding:14px 0;display:flex;justify-content:space-between;align-items:center}
-.faq-q::after{content:'+';font-family:var(--mono);color:var(--text3);font-size:1rem}
+.mon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px;margin-top:10px}
+.mon-card{background:var(--bg2);border:1px solid var(--b);border-radius:8px;padding:10px 12px}
+.mon-card .mn{font-weight:600;font-size:0.75rem;margin-bottom:3px}
+.mon-card .ms{font-family:var(--mono);font-size:0.62rem}.ms.on{color:var(--g)}.ms.off{color:var(--r)}.ms.warn{color:var(--a)}
+.mon-card .mm{font-family:var(--mono);font-size:0.6rem;color:var(--t3);margin-top:3px}
+
+.guide-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.gcard{background:var(--bg2);border:1px solid var(--b);border-radius:10px;padding:18px}
+.gcard h3{font-family:var(--mono);font-size:0.75rem;color:var(--ac);margin-bottom:8px}
+.gcard p,.gcard li{font-size:0.72rem;color:var(--t2);line-height:1.7}
+.gcard ul{padding-left:14px}
+.gcard pre{background:rgba(0,0,0,0.3);border:1px solid var(--b);border-radius:6px;padding:8px 12px;overflow-x:auto;margin:6px 0}
+.gcard code{font-family:var(--mono);font-size:0.62rem;color:var(--g);line-height:1.8}
+@media(max-width:768px){.guide-wrap{display:flex;overflow-x:auto;gap:8px;scroll-snap-type:x mandatory;scrollbar-width:none}.guide-wrap::-webkit-scrollbar{display:none}.gcard{min-width:260px;scroll-snap-align:start}}
+
+.faq-card{background:var(--bg2);border:1px solid var(--b);border-radius:10px;padding:0 18px}
+.faq-item{border-bottom:1px solid var(--b);cursor:pointer}
+.faq-item:last-child{border-bottom:none}
+.faq-q{font-weight:600;font-size:0.8rem;padding:14px 0;display:flex;justify-content:space-between;align-items:center}
+.faq-q::after{content:'+';font-family:var(--mono);color:var(--t3)}
 .faq-item.open .faq-q::after{content:'−'}
-.faq-a{display:none;padding:0 0 14px;font-size:0.78rem;color:var(--text2);line-height:1.9}
+.faq-a{display:none;padding:0 0 14px;font-size:0.75rem;color:var(--t2);line-height:1.8}
 .faq-item.open .faq-a{display:block}
 
-/* ====== FOOTER ====== */
-.footer{text-align:center;padding:24px;border-top:1px solid var(--border);margin-top:24px;color:var(--text3);font-size:0.65rem;line-height:2.2}
-.footer a{color:var(--accent);text-decoration:none}
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--ac);text-decoration:none;font-size:0.75rem;margin-bottom:16px;cursor:pointer}
+.back-link:hover{color:var(--t)}
 
-/* ====== CURRENCY TOGGLE ====== */
-.cur-switch{display:flex;gap:0;margin-bottom:16px;justify-content:flex-end}
-.cur-btn{
-  background:none;border:1px solid var(--border);color:var(--text3);
-  font-family:var(--mono);font-size:0.68rem;padding:6px 16px;cursor:pointer;
-  transition:all 0.15s;
-}
-.cur-btn:first-child{border-radius:6px 0 0 6px}
-.cur-btn:last-child{border-radius:0 6px 6px 0}
-.cur-btn.active{background:rgba(99,102,241,0.15);border-color:var(--accent);color:#a5b4fc}
-
-/* ====== DESKTOP TABS ====== */
-.dtabs{display:flex;gap:8px;margin-bottom:20px}
-.dtab{
-  background:none;border:none;color:var(--text3);
-  font-family:var(--mono);font-size:0.72rem;padding:8px 0;cursor:pointer;
-  border-bottom:2px solid transparent;transition:all 0.15s;margin-right:20px;
-}
-.dtab:hover{color:var(--text)}
-.dtab.on{color:var(--green);border-bottom-color:var(--green)}
-@media(max-width:640px){.dtabs{display:none}}
-
-/* ====== MOBILE NAV ====== */
-.mnav{display:none;gap:8px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
-.mnav::-webkit-scrollbar{display:none}
-.mnav a{
-  flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:0.72rem;
-  color:var(--text2);text-decoration:none;background:var(--bg-card);
-  border:1px solid var(--border);white-space:nowrap;
-}
-.mnav a.hl{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.2);color:var(--green)}
-@media(max-width:640px){.mnav{display:flex}}
-
-/* ====== SECTIONS ====== */
-.sec{display:none}
-.sec.show{display:block}
-@media(max-width:640px){
-  .sec{display:block;margin-bottom:24px}
-  .sec+.sec{border-top:1px solid var(--border);padding-top:24px}
-}
-
-/* ====== ANIMATION ====== */
-@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.hero{animation:in 0.5s ease-out}
+.footer{text-align:center;padding:20px;border-top:1px solid var(--b);margin-top:24px;color:var(--t3);font-size:0.62rem;line-height:2;font-family:var(--mono)}
+.footer a{color:var(--ac);text-decoration:none}
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <header class="bar">
-  <div class="bar-left">
-    <span class="bar-dot" id="dot"></span> TOKEN TRANSIT
-  </div>
+  <div class="bar-l"><span class="bar-dot" id="dot"></span> TOKEN TRANSIT</div>
   <span class="bar-time" id="bar-time">--</span>
 </header>
 
-<main class="main">
+<main class="main" id="main-view">
 
-<!-- HERO: THE ONE THING THAT MATTERS -->
+<!-- HERO -->
 <section class="hero" id="hero">
   <div class="hero-label">🥇 今日最推荐</div>
-  <div class="hero-name" id="h-name">--</div>
-  <div class="hero-tags" id="h-tags"></div>
-  <div class="hero-price-block">
-    <div class="hero-model-label">GPT-4o 输入价格</div>
-    <div class="hero-price-row">
-      <span class="hero-price" id="h-price">--</span>
-      <span class="hero-price-unit" id="h-unit">/百万token</span>
-      <span class="hero-save" id="h-save">--</span>
+  <div class="hero-row">
+    <div class="hero-info">
+      <div class="hero-name" id="h-name">--</div>
+      <div class="hero-meta" id="h-meta"></div>
+      <div class="hero-price-box">
+        <div class="hero-price-label">GPT-4o 输入价格</div>
+        <div class="hero-price-row">
+          <span class="hero-price" id="h-price">--</span>
+          <span class="hero-price-sub">/百万token</span>
+          <span class="hero-save" id="h-save">--</span>
+        </div>
+        <div class="hero-vs">官方直连 <em id="h-official">--</em> · 24h可用率 <strong id="h-uptime" style="color:var(--g)">--</strong></div>
+      </div>
     </div>
-    <div class="hero-compare">
-      官方直连 <span id="h-official">--</span> · 24h可用率 <strong id="h-uptime" style="color:var(--green)">--</strong>
-    </div>
-  </div>
-  <div class="hero-foot">
-    <div class="hero-meta" id="h-meta"></div>
     <a class="hero-cta" id="h-cta" href="#" target="_blank" rel="nofollow">去注册 →</a>
   </div>
 </section>
 
 <!-- CURRENCY -->
-<div class="cur-switch">
-  <button class="cur-btn active" data-cur="cny">¥ 人民币</button>
-  <button class="cur-btn" data-cur="usd">$ 美元</button>
+<div class="cur">
+  <button class="cur-btn on" data-cur="cny">¥ CNY</button>
+  <button class="cur-btn" data-cur="usd">$ USD</button>
 </div>
 
-<!-- DESKTOP TABS -->
-<nav class="dtabs" id="dtabs">
-  <button class="dtab on" data-tab="pricing">比价</button>
-  <button class="dtab" data-tab="monitor">监控</button>
-  <button class="dtab" data-tab="guide">接入指南</button>
-  <button class="dtab" data-tab="faq">FAQ</button>
+<!-- QUICK TOP 3 -->
+<div class="quick-title">GPT-4o 价格速览（最便宜 Top 3）</div>
+<div class="quick-list" id="quick-list"></div>
+
+<!-- VIEW FULL COMPARISON BUTTON -->
+<button class="btn-more" id="btn-more" onclick="toggleFull()">查看全部 7 站完整对比 ▼</button>
+
+<!-- FULL COMPARISON (hidden) -->
+<div class="full-view" id="full-view">
+  <div class="tbl-title">GPT-4o 价格对比 <span id="gpt-badge"></span></div>
+  <div class="tbl-wrap"><table><thead><tr><th>站点</th><th>风险</th><th>输入价</th><th>输出价</th><th>比官方省</th><th>支付方式</th><th>可用率</th><th></th></tr></thead><tbody id="gpt-tbody"></tbody></table></div>
+
+  <div class="tbl-title">Claude Opus 4 价格对比 <span id="claude-badge"></span></div>
+  <div class="tbl-wrap"><table><thead><tr><th>站点</th><th>风险</th><th>输入价</th><th>输出价</th><th>比官方省</th><th>模型数</th><th>备注</th><th></th></tr></thead><tbody id="claude-tbody"></tbody></table></div>
+</div>
+
+<!-- BOTTOM NAV CARDS -->
+<nav class="nav-cards">
+  <a class="nav-card" href="javascript:void(0)" onclick="showDetail('monitor')">
+    <div class="icon">📡</div><div class="label">实时监控</div><div class="sub">可用率 & 延迟</div>
+  </a>
+  <a class="nav-card" href="javascript:void(0)" onclick="showDetail('guide')">
+    <div class="icon">📖</div><div class="label">接入指南</div><div class="sub">3 分钟上手</div>
+  </a>
+  <a class="nav-card" href="javascript:void(0)" onclick="showDetail('faq')">
+    <div class="icon">❓</div><div class="label">常见问题</div><div class="sub">防跑路必读</div>
+  </a>
 </nav>
 
-<!-- MOBILE NAV -->
-<nav class="mnav">
-  <a href="#sec-pricing" class="hl">💰 比价</a>
-  <a href="#sec-monitor">📡 监控</a>
-  <a href="#sec-guide">📖 指南</a>
-  <a href="#sec-faq">❓ FAQ</a>
-</nav>
-
-<!-- ====== PRICING ====== -->
-<section class="sec show" id="sec-pricing">
-  <div class="sec-title">GPT-4o 价格对比 <span id="gpt-badge"></span></div>
-  <div class="table-wrap">
-  <table class="cmp-table">
-    <thead><tr><th>站点</th><th>风险</th><th>输入价</th><th>输出价</th><th>比官方省</th><th>支付方式</th><th>可用率</th><th></th></tr></thead>
-    <tbody id="gpt-tbody"></tbody>
-  </table>
-  </div>
-
-  <div class="sec-title" style="margin-top:20px">Claude Opus 4 价格对比 <span id="claude-badge"></span></div>
-  <div class="table-wrap">
-  <table class="cmp-table">
-    <thead><tr><th>站点</th><th>风险</th><th>输入价</th><th>输出价</th><th>比官方省</th><th>模型数</th><th>备注</th><th></th></tr></thead>
-    <tbody id="claude-tbody"></tbody>
-  </table>
-  </div>
-</section>
-
-<!-- ====== MONITOR ====== -->
-<section class="sec" id="sec-monitor">
+<!-- DETAIL SECTIONS -->
+<div class="detail" id="detail-monitor">
+  <a class="back-link" href="javascript:void(0)" onclick="hideDetail()">← 返回首页</a>
   <div id="alerts"></div>
   <div class="mon-grid" id="mon-grid"></div>
-</section>
+</div>
 
-<!-- ====== GUIDE ====== -->
-<section class="sec" id="sec-guide">
+<div class="detail" id="detail-guide">
+  <a class="back-link" href="javascript:void(0)" onclick="hideDetail()">← 返回首页</a>
   <div class="guide-wrap">
-    <div class="guide">
-      <h3>01 / 快速接入</h3>
-      <p>只需改 2 行配置：</p>
-      <pre><code>export OPENAI_BASE_URL="https://api.oaipro.com/v1"
+    <div class="gcard"><h3>01 / 快速接入</h3><p>只需改 2 行配置：</p><pre><code>export OPENAI_BASE_URL="https://api.oaipro.com/v1"
 export OPENAI_API_KEY="sk-xxxxxxxx"
 
 client = OpenAI(
   base_url="...",
   api_key="sk-..."
-)</code></pre>
-    </div>
-    <div class="guide">
-      <h3>02 / 选站建议</h3>
-      <ul>
-        <li><strong>追求稳定</strong> → OpenRouter（300+模型，$1.3B估值）</li>
-        <li><strong>低延迟</strong> → oaipro（香港节点）</li>
-        <li><strong>需开发票</strong> → YesCode（对公转账）</li>
-        <li><strong>最低成本</strong> → 国产模型直连（DeepSeek ¥1起）</li>
-      </ul>
-    </div>
-    <div class="guide">
-      <h3>03 / 安全须知</h3>
-      <ul>
-        <li>🟢 官转站：官方渠道采购，安全等同直连</li>
-        <li>🟡 混合站：建议小额充值，勿囤余额</li>
-        <li>🔴 灰产站：逆向账号，风险极高</li>
-        <li>单次充值 ≤ ¥200，1主+1备</li>
-      </ul>
-    </div>
+)</code></pre></div>
+    <div class="gcard"><h3>02 / 选站建议</h3><ul><li><strong>稳定</strong> → OpenRouter（300+模型）</li><li><strong>低延迟</strong> → oaipro（香港节点）</li><li><strong>需开票</strong> → YesCode（对公转账）</li><li><strong>最低成本</strong> → 国产模型直连</li></ul></div>
+    <div class="gcard"><h3>03 / 安全须知</h3><ul><li>🟢 官转站：官方渠道采购</li><li>🟡 混合站：小额充值勿囤余额</li><li>🔴 灰产站：风险极高</li><li>单次 ≤ ¥200，1主+1备</li></ul></div>
   </div>
-</section>
+</div>
 
-<!-- ====== FAQ ====== -->
-<section class="sec" id="sec-faq">
-  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:0 20px">
-    <div class="faq-item"><div class="faq-q">用中转站会被 OpenAI 封号吗？</div><div class="faq-a">正规官转站（OpenRouter/YesCode/oaipro）从 OpenAI 官方渠道采购 API，和你直连完全一样。OpenAI 封的是违反 ToS 的行为（非支持地区直连 + 逆向账号），不是正常 API 调用。判断依据：你拿到的是 sk- 开头的 Key → 官转。</div></div>
-    <div class="faq-item"><div class="faq-q">为什么中转站比官方还便宜？</div><div class="faq-a">正规站的便宜来自批量采购折扣、Prompt 缓存套利（重复 System Prompt 官方半价）、Batch API 套利（非紧急请求打包走 Batch，官方 5 折）。如果价格低到官方 0.3 折以下，大概率是逆向账号拼车或模型掉包。</div></div>
-    <div class="faq-item"><div class="faq-q">哪个站延迟最低？</div><div class="faq-a">一般规律：香港节点（30-80ms）< 日本/新加坡（60-150ms）< 美国（200-400ms）。本站推荐：oaipro（香港）、YesCode（日本）、OpenRouter（美国，最稳定）。实际延迟和你本地网络有关。</div></div>
-    <div class="faq-item"><div class="faq-q">充了钱中转站跑路了怎么办？</div><div class="faq-a">降低风险：1) 单次充值 ≤ ¥200；2) 用光再充，不因优惠充年卡；3) 1 主 + 2 备，不依赖一家；4) 运营 < 6 个月的站跑路概率最高。本站不卖 Token，只提供中立评测。</div></div>
-    <div class="faq-item"><div class="faq-q">用中转站能用 Claude 吗？</div><div class="faq-a">目前官转站仍可用（通过海外实体采购）。但 Anthropic 反制力度在加强。兜底：DeepSeek V4 性能接近 Claude，¥3-6/百万 Token；通义千问 Qwen3.6 免费额度充裕。</div></div>
+<div class="detail" id="detail-faq">
+  <a class="back-link" href="javascript:void(0)" onclick="hideDetail()">← 返回首页</a>
+  <div class="faq-card">
+    <div class="faq-item"><div class="faq-q">用中转站会被 OpenAI 封号吗？</div><div class="faq-a">正规官转站（OpenRouter/YesCode/oaipro）从 OpenAI 官方渠道采购 API，和你直连完全一样。OpenAI 封的是违反 ToS 的行为，不是正常 API 调用。判断依据：拿到 sk- 开头的 Key → 官转。</div></div>
+    <div class="faq-item"><div class="faq-q">为什么中转站比官方还便宜？</div><div class="faq-a">正规站的便宜来自批量采购折扣、Prompt 缓存套利、Batch API 套利。价格低到官方 0.3 折以下大概率是逆向账号拼车或模型掉包。</div></div>
+    <div class="faq-item"><div class="faq-q">充了钱中转站跑路了怎么办？</div><div class="faq-a">降低风险：1) 单次充值 ≤ ¥200；2) 用光再充不囤余额；3) 1主+2备不依赖一家；4) 运营<6个月的站跑路概率最高。本站不卖 Token，仅提供中立评测。</div></div>
+    <div class="faq-item"><div class="faq-q">用中转站能用 Claude 吗？</div><div class="faq-a">目前官转站仍可用（通过海外实体采购）。Anthropic 反制在加强。兜底：DeepSeek V4 性能接近 Claude，¥3-6/百万Token；通义千问 Qwen3.6 免费额度充裕。</div></div>
   </div>
-</section>
+</div>
 
 </main>
 
 <footer class="footer">
-  <p>TOKEN TRANSIT — AI API 中转站实时比价监控</p>
-  <p>数据每 10 分钟自动刷新 · 本站不卖 Token，仅提供中立评测</p>
+  <p>TOKEN TRANSIT — AI API 中转站实时比价监控 · 数据每 10 分钟自动刷新 · 本站仅提供中立评测</p>
   <p><span id="footer-time">--</span> · 🤖 GitHub Actions 自动检测 · 💬 <a href="https://v2ex.com" target="_blank">V2EX 讨论</a></p>
 </footer>
 
 <script>
-// ====== DATA ======
-const CNY = 7.2;
-let cur = 'cny';
-const OFFICIAL = {gpt4o_input:2.50,gpt4o_output:10.00,claude_input:15.00,claude_output:75.00};
+const CNY=7.2;let cur='cny';
+const OFF={g4i:2.50,g4o:10.00,ci:15.00,co:75.00};
+const SS=[{n:"OpenRouter",tp:"官转",rk:"🟢",lv:"safe",url:"https://openrouter.ai",pr:{g4i:2.64,g4o:10.55,ci:16.80,co:84.00,nt:"官方价+5.5%"},pay:["信用卡","PayPal","USDT"],min:"$5",mc:300,reg:"美国",desc:"最老牌官转，300+模型，最稳定"},{n:"YesCode",tp:"官转",rk:"🟢",lv:"safe",url:"https://yescode.io",pr:{g4i:2.75,g4o:11.00,ci:17.50,co:87.50,nt:"企业可开票"},pay:["微信","支付宝","对公转账"],min:"¥10",mc:200,reg:"日本",desc:"企业友好，支持开发票"},{n:"oaipro",tp:"官转",rk:"🟢",lv:"safe",url:"https://oaipro.com",pr:{g4i:2.75,g4o:11.00,ci:17.50,co:87.50,nt:"纯官转口碑稳"},pay:["微信","支付宝"],min:"¥10",mc:150,reg:"香港",desc:"香港低延迟，纯官转口碑好"},{n:"Cubence",tp:"官转",rk:"🟢",lv:"safe",url:"https://cubence.com",pr:{g4i:2.80,g4o:11.20,ci:18.00,co:90.00,nt:"官转+包月套餐"},pay:["微信","支付宝","信用卡"],min:"¥20",mc:180,reg:"新加坡",desc:"包月套餐适合高用量"},{n:"Duck Code",tp:"混合",rk:"🟡",lv:"warn",url:"https://duckcode.com",pr:{g4i:2.00,g4o:8.00,ci:12.00,co:60.00,nt:"按量口碑佳"},pay:["微信","支付宝"],min:"¥10",mc:120,reg:"日本",desc:"价格实惠，按量付费口碑好"},{n:"PackyCode",tp:"混合",rk:"🟡",lv:"warn",url:"https://packycode.com",pr:{g4i:1.80,g4o:7.20,ci:10.50,co:52.50,nt:"技术力口碑第一"},pay:["微信","支付宝"],min:"¥10",mc:100,reg:"香港",desc:"技术实力强延迟低"},{n:"Privnode",tp:"混合",rk:"🟡",lv:"warn",url:"https://privnode.com",pr:{g4i:1.00,g4o:4.00,ci:6.00,co:30.00,nt:"价格最低稳待验"},pay:["微信","USDT"],min:"¥5",mc:80,reg:"未知",desc:"极致低价，稳定性需验证"}];
+let mdat=null,hdat={},fullOpen=false;
 
-const SS = [
-  {n:"OpenRouter",tp:"官转",rk:"🟢",lv:"safe",url:"https://openrouter.ai",pr:{g4i:2.64,g4o:10.55,ci:16.80,co:84.00,nt:"官方价+5.5%"},pay:["信用卡","PayPal","USDT"],min:"$5",mc:300,reg:"美国",desc:"最老牌官转，300+模型，最稳定"},
-  {n:"YesCode",tp:"官转",rk:"🟢",lv:"safe",url:"https://yescode.io",pr:{g4i:2.75,g4o:11.00,ci:17.50,co:87.50,nt:"企业可开票"},pay:["微信","支付宝","对公转账"],min:"¥10",mc:200,reg:"日本",desc:"企业友好，支持对公转账开发票"},
-  {n:"oaipro",tp:"官转",rk:"🟢",lv:"safe",url:"https://oaipro.com",pr:{g4i:2.75,g4o:11.00,ci:17.50,co:87.50,nt:"纯官转口碑稳"},pay:["微信","支付宝"],min:"¥10",mc:150,reg:"香港",desc:"香港节点低延迟，纯官转口碑好"},
-  {n:"Cubence",tp:"官转",rk:"🟢",lv:"safe",url:"https://cubence.com",pr:{g4i:2.80,g4o:11.20,ci:18.00,co:90.00,nt:"官转+包月套餐"},pay:["微信","支付宝","信用卡"],min:"¥20",mc:180,reg:"新加坡",desc:"包月套餐适合高用量用户"},
-  {n:"Duck Code",tp:"混合",rk:"🟡",lv:"warn",url:"https://duckcode.com",pr:{g4i:2.00,g4o:8.00,ci:12.00,co:60.00,nt:"按量口碑佳"},pay:["微信","支付宝"],min:"¥10",mc:120,reg:"日本",desc:"价格实惠，按量付费口碑好"},
-  {n:"PackyCode",tp:"混合",rk:"🟡",lv:"warn",url:"https://packycode.com",pr:{g4i:1.80,g4o:7.20,ci:10.50,co:52.50,nt:"技术力口碑第一"},pay:["微信","支付宝"],min:"¥10",mc:100,reg:"香港",desc:"技术实力强，延迟低"},
-  {n:"Privnode",tp:"混合",rk:"🟡",lv:"warn",url:"https://privnode.com",pr:{g4i:1.00,g4o:4.00,ci:6.00,co:30.00,nt:"价格最低稳待验"},pay:["微信","USDT"],min:"¥5",mc:80,reg:"未知",desc:"极致低价，稳定性需验证"}
-];
-
-let mdat = null, hdat = {};
-
-// ====== HELPERS ======
 function fm(u){return cur==='cny'?'¥'+(u*CNY).toFixed(2):'$'+u.toFixed(2)}
 function fu(){return cur==='cny'?'¥/百万token':'$/1M tokens'}
-function sav(p,o){const d=o-p;const pc=Math.round((1-p/o)*100);if(pc<=0)return{t:'与官方持平',c:'ok'};return{t:`省 ${fm(d)} (▼${pc}%)`,c:'good'};}
-
+function sv(p,o){const d=o-p;const pc=Math.round((1-p/o)*100);if(pc<=0)return{t:'持平',c:'ok'};return{t:`省 ${fm(d)} (▼${pc}%)`,c:'good'};}
 function bestS(){return SS.reduce((b,s)=>s.lv==='safe'&&s.pr.g4i<b.pr.g4i?s:b,SS[0])}
-
 function ms(n){return mdat?.stations?.find(s=>s.n===n)||null}
 function up24(n){const r=hdat[n]||[];if(!r.length)return null;return Math.round(r.filter(x=>x.status==='在线').length/r.length*100)}
 
-// ====== RENDER HERO ======
 function rHero(){
-  const b=bestS();const sv=sav(b.pr.g4i,OFFICIAL.gpt4o_input);const up=up24(b.n);
+  const b=bestS(),s=sv(b.pr.g4i,OFF.g4i),up=up24(b.n);
   document.getElementById('h-name').textContent=b.n;
-  document.getElementById('h-tags').innerHTML=`<span class="hero-tag safe">${b.rk} ${b.tp}</span><span class="hero-tag pay">${b.pay.filter(p=>p.includes('微信')||p.includes('支付宝')).join(' / ')}</span>`;
+  document.getElementById('h-meta').innerHTML=`<span>${b.rk} ${b.tp}</span><span>${b.desc}</span><span>${b.reg}节点</span>`;
   document.getElementById('h-price').textContent=fm(b.pr.g4i);
-  document.getElementById('h-unit').textContent='/百万token';
-  document.getElementById('h-save').textContent=sv.t;
-  document.getElementById('h-official').textContent=fm(OFFICIAL.gpt4o_input);
-  document.getElementById('h-uptime').textContent=up!==null?up+'%':'--';
-  document.getElementById('h-uptime').style.color=up>=99?'var(--green)':up>=95?'var(--amber)':'var(--text2)';
-  document.getElementById('h-meta').innerHTML=`${b.desc} · ${b.reg}节点 · ${b.mc}模型`;
+  document.getElementById('h-save').textContent=s.t;
+  document.getElementById('h-official').textContent=fm(OFF.g4i);
+  const upEl=document.getElementById('h-uptime');upEl.textContent=up!==null?up+'%':'--';upEl.style.color=up>=99?'var(--g)':up>=95?'var(--a)':'var(--t2)';
   document.getElementById('h-cta').href=b.url;
 }
 
-// ====== RENDER PRICING TABLE ======
-function rPricing(){
+function rQuick(){
+  const sorted=[...SS].sort((a,b)=>a.pr.g4i-b.pr.g4i).slice(0,3);
+  const best=bestS();
+  document.getElementById('quick-list').innerHTML=sorted.map((s,i)=>{
+    const svv=sv(s.pr.g4i,OFF.g4i);const isB=s.n===best.n;
+    return`<div class="quick-row ${isB?'best':''}" onclick="${isB?'':"document.getElementById('hero').scrollIntoView({behavior:'smooth'})"}">
+      <div class="quick-left"><span class="quick-name">${s.n}</span><span class="quick-risk">${s.rk}</span><span style="font-size:0.68rem;color:var(--t3)">${s.tp}</span></div>
+      <div class="quick-right"><span class="quick-price ${s.pr.g4i===sorted[0].pr.g4i?'low':''}">${fm(s.pr.g4i)}</span><span class="quick-save">${svv.t}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function rFull(){
   const sorted=[...SS].sort((a,b)=>a.pr.g4i-b.pr.g4i);
   const best=bestS();
   document.getElementById('gpt-badge').textContent=fu();
   document.getElementById('gpt-tbody').innerHTML=sorted.map(s=>{
-    const sv=sav(s.pr.g4i,OFFICIAL.gpt4o_input);const up=up24(s.n);const isB=s.n===best.n;
-    const upStr=up!==null?`${up}%`:'--';const upC=up>=99?'var(--green)':up>=95?'var(--amber)':'var(--text2)';
-    return`<tr class="${isB?'best':''}"><td><strong>${s.n}</strong></td><td>${s.rk} ${s.tp}</td><td class="price-num low">${fm(s.pr.g4i)}</td><td class="price-num">${fm(s.pr.g4o)}</td><td class="save-num ${sv.c}">${sv.t}</td><td>${s.pay.map(p=>`<span class="pay-badge">${p==='微信'?'💚':p==='支付宝'?'💙':p==='对公转账'?'🏦':p==='USDT'?'💎':'💳'} ${p}</span>`).join('')}</td><td style="font-family:var(--mono);color:${upC}">${upStr}</td><td><a href="${s.url}" target="_blank" rel="nofollow" class="cta-sm">注册 →</a></td></tr>`;
+    const svv=sv(s.pr.g4i,OFF.g4i);const up=up24(s.n);const isB=s.n===best.n;
+    return`<tr class="${isB?'row-best':''}"><td><strong>${s.n}</strong></td><td>${s.rk} ${s.tp}</td><td class="pn green">${fm(s.pr.g4i)}</td><td class="pn">${fm(s.pr.g4o)}</td><td class="sn ${svv.c}">${svv.t}</td><td>${s.pay.map(p=>`<span class="pb">${p==='微信'?'💚':p==='支付宝'?'💙':p==='对公转账'?'🏦':p==='USDT'?'💎':'💳'} ${p}</span>`).join('')}</td><td style="font-family:var(--mono);color:${up>=99?'var(--g)':up>=95?'var(--a)':'var(--t2)'}">${up!==null?up+'%':'--'}</td><td><a href="${s.url}" target="_blank" rel="nofollow" class="lk">注册 →</a></td></tr>`;
   }).join('');
-
   document.getElementById('claude-badge').textContent=fu();
   document.getElementById('claude-tbody').innerHTML=sorted.map(s=>{
-    const sv=sav(s.pr.ci,OFFICIAL.claude_input);
-    return`<tr><td><strong>${s.n}</strong></td><td>${s.rk} ${s.tp}</td><td class="price-num low">${fm(s.pr.ci)}</td><td class="price-num">${fm(s.pr.co)}</td><td class="save-num ${sv.c}">${sv.t}</td><td style="font-family:var(--mono)">${s.mc}</td><td style="font-size:0.7rem;color:var(--text3)">${s.pr.nt}</td><td><a href="${s.url}" target="_blank" rel="nofollow" class="cta-sm">注册 →</a></td></tr>`;
+    const svv=sv(s.pr.ci,OFF.ci);
+    return`<tr><td><strong>${s.n}</strong></td><td>${s.rk} ${s.tp}</td><td class="pn green">${fm(s.pr.ci)}</td><td class="pn">${fm(s.pr.co)}</td><td class="sn ${svv.c}">${svv.t}</td><td style="font-family:var(--mono)">${s.mc}</td><td style="font-size:0.68rem;color:var(--t3)">${s.pr.nt}</td><td><a href="${s.url}" target="_blank" rel="nofollow" class="lk">注册 →</a></td></tr>`;
   }).join('');
 }
 
-// ====== RENDER MONITOR ======
 function rMonitor(){
-  const g=document.getElementById('mon-grid');
-  const a=document.getElementById('alerts');
-  if(mdat?.alerts?.length){
-    a.innerHTML=mdat.alerts.map(x=>`<div class="alert ${x.startsWith('🔴')?'crit':'warn'}">${x.startsWith('🔴')?'●':'○'} ${x}</div>`).join('');
-  }else{a.innerHTML=''}
-  if(!mdat?.stations){g.innerHTML=SS.map(s=>`<div class="mon-card"><div class="n">${s.n}</div><div class="s" style="color:var(--text3)">等待检测</div></div>`).join('');return}
-  g.innerHTML=SS.map(s=>{
-    const m=ms(s.n);if(!m)return`<div class="mon-card"><div class="n">${s.n}</div><div class="s" style="color:var(--text3)">未检测</div></div>`;
-    const cls=m.status==='在线'?'on':m.status.includes('异常')?'warn':'off';const up=up24(s.n);
-    return`<div class="mon-card"><div class="n">${s.n} ${s.rk}</div><div class="s ${cls}">${m.status}</div><div class="m">${m.delay_ms?m.delay_ms+'ms':''}${up!==null?' · 24h:'+up+'%':''}</div></div>`;
-  }).join('');
-}
+  const g=document.getElementById('mon-grid'),a=document.getElementById('alerts');
+  if(mdat?.alerts?.length){a.innerHTML=mdat.alerts.map(x=>`<div class="alert-item ${x.startsWith('🔴')?'crit':'warn'}">${x.startsWith('🔴')?'●':'○'} ${x}</div>`).join('')}else{a.innerHTML=''}
+  if(!mdat?.stations){g.innerHTML=SS.map(s=>`<div class="mon-card"><div class="mn">${s.n}</div><div class="ms" style="color:var(--t3)">等待检测</div></div>`).join('');return}
+  g.innerHTML=SS.map(s=>{const m=ms(s.n);if(!m)return`<div class="mon-card"><div class="mn">${s.n}</div><div class="ms" style="color:var(--t3)">未检测</div></div>`;const cls=m.status==='在线'?'on':m.status.includes('异常')?'warn':'off';const up=up24(s.n);return`<div class="mon-card"><div class="mn">${s.n} ${s.rk}</div><div class="ms ${cls}">${m.status}</div><div class="mm">${m.delay_ms?m.delay_ms+'ms':''}${up!==null?' · 24h:'+up+'%':''}</div></div>`}).join('')}
 
-// ====== UPDATE BAR ======
 function uBar(){
   let on=0;if(mdat?.stations)on=mdat.stations.filter(s=>s.status==='在线').length;
-  const d=document.getElementById('dot');
-  d.style.background=on===SS.length?'var(--green)':on>=SS.length/2?'var(--amber)':'var(--red)';
-  if(mdat?.updated_at){
-    const t=new Date(mdat.updated_at);const ago=Math.round((Date.now()-t.getTime())/60000);
-    const ts=ago<1?'刚刚更新':ago+'分钟前更新';
-    document.getElementById('bar-time').textContent='🔄 '+ts;
-    document.getElementById('footer-time').textContent='数据更新: '+t.toLocaleString('zh-CN');
-  }
+  const d=document.getElementById('dot');d.style.background=on===SS.length?'var(--g)':on>=SS.length/2?'var(--a)':'var(--r)';
+  if(mdat?.updated_at){const t=new Date(mdat.updated_at);const ago=Math.round((Date.now()-t.getTime())/60000);document.getElementById('bar-time').textContent='🔄 '+(ago<1?'刚刚':ago+'分钟前');document.getElementById('footer-time').textContent='数据更新: '+t.toLocaleString('zh-CN')}
 }
 
-function rAll(){rHero();rPricing();rMonitor();uBar()}
+function rAll(){rHero();rQuick();rFull();rMonitor();uBar()}
 
-// ====== LOAD ======
-async function ld(){
-  try{const r=await fetch('data/stations.json?'+Date.now());mdat=await r.json()}catch(e){mdat=null}
-  try{const r=await fetch('data/history.json?'+Date.now());hdat=await r.json()}catch(e){hdat={}}
+function toggleFull(){fullOpen=!fullOpen;const fv=document.getElementById('full-view');const btn=document.getElementById('btn-more');if(fullOpen){fv.classList.add('show');btn.textContent='收起完整对比 ▲';btn.classList.add('open')}else{fv.classList.remove('show');btn.textContent='查看全部 7 站完整对比 ▼';btn.classList.remove('open')}}
+
+function showDetail(id){
+  document.querySelectorAll('.detail').forEach(d=>d.classList.remove('show'));
+  document.getElementById('detail-'+id).classList.add('show');
+  document.querySelector('.nav-cards').style.display='none';
+  document.getElementById('btn-more').style.display='none';
+  document.getElementById('full-view').classList.remove('show');fullOpen=false;
+  document.querySelector('.quick-list').style.display='none';
+  document.querySelector('.quick-title').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
 }
+
+function hideDetail(){
+  document.querySelectorAll('.detail').forEach(d=>d.classList.remove('show'));
+  document.querySelector('.nav-cards').style.display='';
+  document.getElementById('btn-more').style.display='';
+  document.querySelector('.quick-list').style.display='';
+  document.querySelector('.quick-title').style.display='';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function ld(){try{const r=await fetch('data/stations.json?'+Date.now());mdat=await r.json()}catch(e){mdat=null}try{const r=await fetch('data/history.json?'+Date.now());hdat=await r.json()}catch(e){hdat={}}}
 async function ref(){await ld();rAll()}
 
-// ====== EVENTS ======
-document.querySelectorAll('.cur-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.cur-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');cur=b.dataset.cur;rAll()})});
-
-document.querySelectorAll('.dtab').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.dtab').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.sec').forEach(x=>x.classList.remove('show'));b.classList.add('on');document.getElementById('sec-'+b.dataset.tab).classList.add('show')})});
-
+document.querySelectorAll('.cur-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.cur-btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');cur=b.dataset.cur;rAll()})});
 document.querySelectorAll('.faq-q').forEach(q=>{q.addEventListener('click',()=>q.parentElement.classList.toggle('open'))});
-
-document.querySelectorAll('.mnav a').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'})})});
-
 ref();setInterval(ref,600000);
 </script>
 </body>
