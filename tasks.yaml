@@ -1,13 +1,13 @@
 # ==========================================
-# 7天行动清单 - 可执行任务节点
+# 7天行动清单 + 长期自动化 — 可执行任务节点
 # 状态: pending | in_progress | done | skipped
 # 类型: manual(手动) | auto(自动) | semi(半自动)
 # ==========================================
 
 meta:
   project: Token比价站
-  start_date: 待定
-  current_day: 1
+  start_date: 2026-05-13
+  current_day: 3
 
 days:
   - day: 1
@@ -51,35 +51,50 @@ days:
         deps: ["2.1"]
 
   - day: 3
-    title: 自动化 - 让数据自己更新
+    title: 自动化 - 工作流部署
     tasks:
       - id: "3.1"
-        name: 建GitHub仓库并推送代码
-        type: manual
-        status: pending
+        name: 完善automation.py工作流编排器
+        type: semi
+        status: done
         time: 上午0.5h
-        output: 公开仓库
-        verify: git push成功，仓库页面能打开
+        output: 统一入口脚本
+        verify: python automation.py status 显示完整进度
 
       - id: "3.2"
-        name: 配GitHub Actions定时跑monitor.py
+        name: 接入auto_responder.py客户回复模板
         type: semi
-        status: pending
+        status: done
+        time: 上午0.5h
+        output: 8类常见问题自动回复
+        verify: python auto_responder.py list 列出全部模板
+
+      - id: "3.3"
+        name: 接入revenue_tracker.py收益追踪
+        type: semi
+        status: done
         time: 下午0.5h
-        output: .github/workflows/monitor.yml
-        verify: 等10分钟看Actions自动跑成功
-        deps: ["3.1"]
+        output: UV/点击/佣金追踪
+        verify: python revenue_tracker.py summary 显示数据
+
+      - id: "3.4"
+        name: 配置CronCreate定时推送日报
+        type: semi
+        status: done
+        time: 下午0.5h
+        output: 每日21:00自动推送
+        verify: 明天检查飞书是否有新日报
 
   - day: 4
     title: 部署 - 让全世界能访问
     tasks:
       - id: "4.1"
-        name: 开GitHub Pages公网访问
+        name: 开GitHub Pages公网访问（或VPS部署）
         type: manual
         status: pending
         time: 上午0.5h
         output: 公网URL
-        verify: 浏览器打开 https://用户名.github.io/仓库名
+        verify: 浏览器打开能访问
 
       - id: "4.2"
         name: (可选)买域名并绑定
@@ -94,7 +109,7 @@ days:
     title: 引流 - 第一波用户
     tasks:
       - id: "5.1"
-        name: CSDN/掘金写教程文章引流
+        name: CSDN/掘金/知乎写教程文章引流
         type: manual
         status: pending
         time: 上午1.5h
@@ -110,43 +125,59 @@ days:
         verify: 页面有除你之外的UV
         deps: ["5.1"]
 
+      - id: "5.3"
+        name: V2EX/Linux.do 搜索"中转站"帖认真回复引流
+        type: manual
+        status: pending
+        time: 下午0.5h
+        output: 10+条高质量回复
+        verify: 回复有点赞/互动
+
   - day: 6
     title: 优化 - 修一轮bug
     tasks:
       - id: "6.1"
-        name: 检查GitHub Actions稳定性
+        name: 检查监控稳定性（连续24h全成功）
         type: manual
         status: pending
         time: 上午0.5h
-        output: 确认24h监测全成功
-        verify: Actions面板无失败记录
+        output: 确认无监控中断
+        verify: 监控面板无失败记录
 
       - id: "6.2"
-        name: 加新站点+调整排序逻辑
+        name: 加新站点+调整排序逻辑+更新config.yaml
         type: semi
         status: pending
         time: 下午0.5h
-        output: config.yaml更新
-        verify: 数据更全，排序合理
+        output: 数据更全，排序合理
+        verify: 页面刷新后数据正确
 
   - day: 7
     title: 变现 - 埋好收入钩子
     tasks:
       - id: "7.1"
-        name: 表格加"注册链接"列，放推荐码
+        name: 表格加"注册链接"列，放affiliate推荐码
         type: semi
         status: pending
         time: 上午0.5h
         output: 变现链路
-        verify: 点链接能跳到中转站
+        verify: 点链接能跳到中转站，带affiliate参数
 
       - id: "7.2"
-        name: 写第二篇引流文章(红黑榜)
+        name: 写第二篇引流文章(红黑榜/避坑指南)
         type: manual
         status: pending
         time: 下午1h
         output: 第2篇发布
         verify: 阅读量>第一篇
+
+      - id: "7.3"
+        name: 跑通收益追踪 → 确认联盟后台能看到点击和转化
+        type: semi
+        status: pending
+        time: 下午0.5h
+        output: 首笔佣金入账
+        verify: revenue_tracker.py summary 显示佣金>0
 
 # ==========================================
 # 长期自动化任务（7天后持续运行）
@@ -158,6 +189,7 @@ automated_tasks:
     frequency: 每10分钟
     script: monitor.py
     alert: 连续失败3次 → 飞书推送告警
+    status: done
 
   - id: "A2"
     name: 每日进度报告生成
@@ -165,6 +197,7 @@ automated_tasks:
     frequency: 每天21:00
     script: daily_report.py
     output: reports/日报_YYYY-MM-DD.md + 飞书推送
+    status: done
 
   - id: "A3"
     name: 风险预警扫描
@@ -175,15 +208,32 @@ automated_tasks:
       - 任一站点连续不可达>10分钟
       - 3个以上站点同时异常
     alert: 触发任一条件 → 飞书推送告警
+    status: done
 
   - id: "A4"
     name: 每周竞品动向追踪
     type: semi
     frequency: 每周一
     action: 检查竞品站有没有新功能/改价 → 更新config.yaml
+    status: pending
 
   - id: "A5"
     name: 文章引流(持续)
     type: manual
     frequency: 每月2篇
     platforms: [CSDN, 掘金, 知乎]
+    status: pending
+
+  - id: "A6"
+    name: 客户自动回复(模板调用)
+    type: semi
+    frequency: 按需
+    script: auto_responder.py
+    status: done
+
+  - id: "A7"
+    name: 收益数据追踪
+    type: semi
+    frequency: 每日更新UV/点击，佣金即时记录
+    script: revenue_tracker.py
+    status: done

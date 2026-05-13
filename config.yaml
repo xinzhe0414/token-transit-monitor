@@ -1,57 +1,149 @@
 # ==========================================
-# Token 比价站自动化工作流 - 配置文件
+# Token 比价站 - 配置文件 v3
 # ==========================================
 
-# 监控的中转站列表
 stations:
   - name: OpenRouter
     url: https://openrouter.ai/api/v1/models
+    home_url: https://openrouter.ai
     type: 官转
+    risk: 🟢
     affiliate_link: ""
+    pricing:
+      gpt4o_input: 2.64
+      gpt4o_output: 10.55
+      claude_opus_input: 16.80
+      claude_opus_output: 84.00
+      note: "官方价 +5.5% 平台费，300+ 模型"
+    payment: ["信用卡", "PayPal", "USDT"]
+    min_recharge: "$5"
+    models_count: 300
+    region: "美国"
+
   - name: YesCode
     url: https://api.yescode.io/v1/models
+    home_url: https://yescode.io
     type: 官转
+    risk: 🟢
     affiliate_link: ""
+    pricing:
+      gpt4o_input: 2.75
+      gpt4o_output: 11.00
+      claude_opus_input: 17.50
+      claude_opus_output: 87.50
+      note: "约官方 1.1x，企业可开票"
+    payment: ["微信", "支付宝", "对公转账"]
+    min_recharge: "¥10"
+    models_count: 200
+    region: "日本"
+
   - name: oaipro
     url: https://api.oaipro.com/v1/models
+    home_url: https://oaipro.com
     type: 官转
+    risk: 🟢
     affiliate_link: ""
-  - name: Duck Code
-    url: https://api.duckcode.com/v1/models
-    type: 混合
-    affiliate_link: ""
-  - name: PackyCode
-    url: https://api.packycode.com/v1/models
-    type: 混合
-    affiliate_link: ""
-  - name: Privnode
-    url: https://api.privnode.com/v1/models
-    type: 混合
-    affiliate_link: ""
+    pricing:
+      gpt4o_input: 2.75
+      gpt4o_output: 11.00
+      claude_opus_input: 17.50
+      claude_opus_output: 87.50
+      note: "纯官转，口碑稳定"
+    payment: ["微信", "支付宝"]
+    min_recharge: "¥10"
+    models_count: 150
+    region: "香港"
+
   - name: Cubence
     url: https://api.cubence.com/v1/models
+    home_url: https://cubence.com
     type: 官转
+    risk: 🟢
     affiliate_link: ""
+    pricing:
+      gpt4o_input: 2.80
+      gpt4o_output: 11.20
+      claude_opus_input: 18.00
+      claude_opus_output: 90.00
+      note: "官转+包月套餐可选"
+    payment: ["微信", "支付宝", "信用卡"]
+    min_recharge: "¥20"
+    models_count: 180
+    region: "新加坡"
 
-# 告警阈值
+  - name: Duck Code
+    url: https://api.duckcode.com/v1/models
+    home_url: https://duckcode.com
+    type: 混合
+    risk: 🟡
+    affiliate_link: ""
+    pricing:
+      gpt4o_input: 2.00
+      gpt4o_output: 8.00
+      claude_opus_input: 12.00
+      claude_opus_output: 60.00
+      note: "按量口碑最佳，价格有竞争力"
+    payment: ["微信", "支付宝"]
+    min_recharge: "¥10"
+    models_count: 120
+    region: "日本"
+
+  - name: PackyCode
+    url: https://api.packycode.com/v1/models
+    home_url: https://packycode.com
+    type: 混合
+    risk: 🟡
+    affiliate_link: ""
+    pricing:
+      gpt4o_input: 1.80
+      gpt4o_output: 7.20
+      claude_opus_input: 10.50
+      claude_opus_output: 52.50
+      note: "技术力口碑第一，价格偏高"
+    payment: ["微信", "支付宝"]
+    min_recharge: "¥10"
+    models_count: 100
+    region: "香港"
+
+  - name: Privnode
+    url: https://api.privnode.com/v1/models
+    home_url: https://privnode.com
+    type: 混合
+    risk: 🟡
+    affiliate_link: ""
+    pricing:
+      gpt4o_input: 1.00
+      gpt4o_output: 4.00
+      claude_opus_input: 6.00
+      claude_opus_output: 30.00
+      note: "价格最低，但稳定性待验证"
+    payment: ["微信", "USDT"]
+    min_recharge: "¥5"
+    models_count: 80
+    region: "未知"
+
 alerts:
-  latency_warning_ms: 1000      # 延迟超 1000ms → 黄色预警
-  latency_critical_ms: 3000     # 延迟超 3000ms → 红色告警
-  downtime_minutes: 10          # 连续不可达超 10 分钟 → 告警
-  consecutive_failures: 3       # 连续失败 3 次 → 告警
+  latency_warning_ms: 1000
+  latency_critical_ms: 3000
+  downtime_minutes: 10
+  consecutive_failures: 3
 
-# 检测频率
 monitor:
-  interval_minutes: 10          # 每 10 分钟检测一次
+  interval_minutes: 10
 
-# 每日报告推送时间
 report:
-  push_time: "21:00"            # 每晚 9 点推送
-  push_method: feishu_doc       # feishu_doc | feishu_webhook | local_only
+  push_time: "21:00"
+  push_method: feishu_doc
 
-# 飞书配置
 feishu:
-  # 方式1：飞书文档（已可用）
   doc_folder: "Token比价站日报"
-  # 方式2：飞书机器人 Webhook（可选，需在飞书群里添加机器人后填写）
   webhook_url: ""
+
+revenue:
+  auto_track: false
+  ga_property_id: ""
+  umami_share_url: ""
+
+auto_reply:
+  enabled: true
+  stats_file: data/reply_stats.json

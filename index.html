@@ -3,85 +3,638 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Token 中转站比价监控</title>
+<title>Token Transit — AI API 中转站比价监控</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:20px}
-.container{max-width:900px;margin:0 auto}
-h1{text-align:center;margin-bottom:8px;font-size:24px}
-.subtitle{text-align:center;color:#94a3b8;margin-bottom:20px;font-size:14px}
-.card{background:#1e293b;border-radius:12px;padding:20px;margin-bottom:16px}
+/* ====== RESET & BASE ====== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-primary:#0a0e14;
+  --bg-secondary:#12171f;
+  --bg-card:#181e28;
+  --bg-hover:#1e2632;
+  --border:#1e2a3a;
+  --text-primary:#c8d6e5;
+  --text-secondary:#6b7d95;
+  --text-muted:#3e5065;
+  --accent-green:#00e676;
+  --accent-amber:#ffab00;
+  --accent-red:#ff5252;
+  --accent-blue:#448aff;
+  --accent-cyan:#18ffff;
+  --font-mono:'Cascadia Code','Fira Code','JetBrains Mono','Consolas',monospace;
+  --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+html{font-size:15px;background:var(--bg-primary)}
+body{
+  font-family:var(--font-sans);
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  min-height:100vh;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ====== HEADER ====== */
+.header{
+  background:var(--bg-secondary);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:56px;
+  position:sticky;top:0;z-index:100;
+}
+.header-left{display:flex;align-items:center;gap:16px}
+.logo{
+  font-family:var(--font-mono);
+  font-size:1.1rem;
+  font-weight:700;
+  color:var(--accent-green);
+  letter-spacing:-0.5px;
+}
+.logo span{color:var(--text-secondary);font-weight:400}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-green);animation:pulse 2s infinite}
+.status-dot.warn{background:var(--accent-amber)}
+.status-dot.crit{background:var(--accent-red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+.nav{display:flex;gap:4px}
+.nav-btn{
+  background:none;border:none;color:var(--text-secondary);
+  font-family:var(--font-mono);font-size:0.8rem;
+  padding:8px 14px;cursor:pointer;border-radius:4px;
+  transition:all 0.15s;letter-spacing:0.5px;
+}
+.nav-btn:hover{color:var(--text-primary);background:var(--bg-hover)}
+.nav-btn.active{color:var(--accent-green);background:var(--bg-hover)}
+
+.live-time{
+  font-family:var(--font-mono);font-size:0.72rem;
+  color:var(--text-muted);display:flex;align-items:center;gap:8px;
+}
+
+/* ====== MAIN LAYOUT ====== */
+.main{max-width:1320px;margin:0 auto;padding:24px}
+.section{display:none}
+.section.active{display:block}
+
+/* ====== STATS BAR ====== */
+.stats-bar{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+  margin-bottom:20px;
+}
+.stat-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:6px;padding:16px 20px;
+}
+.stat-label{font-family:var(--font-mono);font-size:0.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.stat-value{font-family:var(--font-mono);font-size:1.6rem;font-weight:700}
+.stat-value.green{color:var(--accent-green)}
+.stat-value.amber{color:var(--accent-amber)}
+.stat-value.red{color:var(--accent-red)}
+.stat-value.blue{color:var(--accent-blue)}
+.stat-sub{font-size:0.7rem;color:var(--text-muted);margin-top:2px}
+
+/* ====== TABLE ====== */
+.card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;margin-bottom:16px;
+}
+.card-header{
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg-secondary);
+}
+.card-title{font-family:var(--font-mono);font-size:0.78rem;font-weight:600;letter-spacing:0.5px;text-transform:uppercase}
+.card-badge{font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted)}
+
 table{width:100%;border-collapse:collapse}
-th,td{padding:12px 16px;text-align:left;border-bottom:1px solid #334155}
-th{color:#94a3b8;font-weight:500;font-size:13px}
-td{font-size:14px}
-tr:hover{background:#273548}
-.status-online{color:#4ade80}
-.status-warn{color:#fbbf24}
-.status-offline{color:#f87171}
-.latency-good{color:#4ade80}
-.latency-warn{color:#fbbf24}
-.latency-bad{color:#f87171}
-.updated{text-align:center;color:#64748b;font-size:12px;margin-top:16px}
-.alert-box{background:#7f1d1d;border:1px solid #ef4444;border-radius:8px;padding:12px;margin-bottom:16px;color:#fca5a5}
-.alert-box.warn{background:#78350f;border-color:#f59e0b;color:#fcd34d}
-a{color:#60a5fa;text-decoration:none}
-a:hover{text-decoration:underline}
+th{
+  font-family:var(--font-mono);font-size:0.68rem;font-weight:500;
+  color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;
+  text-align:left;padding:12px 16px;border-bottom:1px solid var(--border);
+  background:var(--bg-secondary);position:sticky;top:56px;
+}
+td{padding:14px 16px;border-bottom:1px solid rgba(30,42,58,0.6);font-size:0.85rem;vertical-align:middle}
+tr:hover td{background:var(--bg-hover)}
+tr:last-child td{border-bottom:none}
+
+.station-name{font-weight:600;display:flex;align-items:center;gap:8px}
+.station-name .name{font-size:0.9rem}
+.station-name .type-tag{
+  font-family:var(--font-mono);font-size:0.6rem;padding:2px 6px;
+  border-radius:3px;letter-spacing:0.5px;
+  background:rgba(68,138,255,0.15);color:var(--accent-blue);
+}
+.type-tag.green{background:rgba(0,230,118,0.15);color:var(--accent-green)}
+.type-tag.amber{background:rgba(255,171,0,0.15);color:var(--accent-amber)}
+
+.risk-badge{
+  font-size:0.8rem;
+}
+
+.status-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--font-mono);font-size:0.75rem;font-weight:600;
+}
+.status-badge.online{color:var(--accent-green)}
+.status-badge.warn{color:var(--accent-amber)}
+.status-badge.offline{color:var(--accent-red)}
+.status-indicator{width:6px;height:6px;border-radius:50%}
+.status-indicator.online{background:var(--accent-green);box-shadow:0 0 6px var(--accent-green)}
+.status-indicator.warn{background:var(--accent-amber);box-shadow:0 0 6px var(--accent-amber)}
+.status-indicator.offline{background:var(--accent-red)}
+
+.latency{font-family:var(--font-mono);font-size:0.82rem;font-weight:600}
+.latency.good{color:var(--accent-green)}
+.latency.warn{color:var(--accent-amber)}
+.latency.bad{color:var(--accent-red)}
+
+.price{font-family:var(--font-mono);font-size:0.78rem}
+.price-label{font-size:0.65rem;color:var(--text-muted)}
+
+.btn-link{
+  font-family:var(--font-mono);font-size:0.7rem;color:var(--accent-blue);
+  text-decoration:none;padding:6px 12px;border:1px solid var(--border);
+  border-radius:4px;transition:all 0.15s;display:inline-block;
+}
+.btn-link:hover{background:rgba(68,138,255,0.1);border-color:var(--accent-blue)}
+
+/* ====== ALERT BAR ====== */
+.alert-bar{margin-bottom:20px}
+.alert-item{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;
+  border-radius:6px;margin-bottom:6px;font-family:var(--font-mono);font-size:0.75rem;
+}
+.alert-item.crit{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.25);color:#ff8a80}
+.alert-item.warn{background:rgba(255,171,0,0.08);border:1px solid rgba(255,171,0,0.2);color:#ffd740}
+
+/* ====== PRICING TABLE ====== */
+.price-compare .model-name{font-weight:600;font-size:0.85rem}
+.price-compare .price-cell{text-align:right;font-family:var(--font-mono)}
+.price-compare .best-price{color:var(--accent-green);font-weight:700}
+.price-compare .price-high{color:var(--accent-amber)}
+
+/* ====== GUIDE ====== */
+.guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.guide-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:8px;padding:24px;
+}
+.guide-card h3{font-family:var(--font-mono);font-size:0.85rem;margin-bottom:12px;color:var(--accent-cyan)}
+.guide-card p,.guide-card li{font-size:0.8rem;color:var(--text-secondary);line-height:1.7}
+.guide-card ul{padding-left:18px}
+.guide-card code{
+  background:var(--bg-hover);color:var(--accent-green);
+  padding:2px 6px;border-radius:3px;font-family:var(--font-mono);font-size:0.75rem;
+}
+.guide-card pre{
+  background:var(--bg-primary);border:1px solid var(--border);
+  border-radius:4px;padding:12px 16px;overflow-x:auto;margin:10px 0;
+}
+.guide-card pre code{background:none;padding:0;font-size:0.72rem;line-height:1.8}
+
+/* ====== FAQ ====== */
+.faq-list{margin-top:16px}
+.faq-item{
+  border-bottom:1px solid var(--border);padding:16px 0;
+  cursor:pointer;
+}
+.faq-q{font-weight:600;font-size:0.85rem;display:flex;justify-content:space-between;align-items:center}
+.faq-q::after{content:'+';font-family:var(--font-mono);color:var(--text-muted);font-size:1rem}
+.faq-item.open .faq-q::after{content:'−'}
+.faq-a{display:none;margin-top:10px;font-size:0.8rem;color:var(--text-secondary);line-height:1.8}
+.faq-item.open .faq-a{display:block}
+
+/* ====== FOOTER ====== */
+.footer{
+  text-align:center;padding:32px;border-top:1px solid var(--border);
+  margin-top:32px;
+}
+.footer p{font-family:var(--font-mono);font-size:0.68rem;color:var(--text-muted);line-height:2}
+.footer a{color:var(--accent-blue);text-decoration:none}
+.footer a:hover{text-decoration:underline}
+
+/* ====== RESPONSIVE ====== */
+@media(max-width:768px){
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
+  .guide-grid{grid-template-columns:1fr}
+  .header{padding:0 12px}
+  .nav-btn{font-size:0.7rem;padding:6px 10px}
+  .main{padding:16px}
+  th,td{padding:10px 8px;font-size:0.72rem}
+  .header-right{display:none}
+}
+
+/* ====== EMPTY STATE ====== */
+.empty-state{text-align:center;padding:48px;color:var(--text-muted)}
+.empty-state .icon{font-size:3rem;margin-bottom:12px}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>Token 中转站比价监控</h1>
-<p class="subtitle">每10分钟自动检测 · 公开数据 · 帮你选最快最稳的站</p>
-<div id="alerts"></div>
-<div class="card">
-<table>
-<thead><tr><th>站名</th><th>类型</th><th>状态</th><th>延迟</th><th>最后检测</th><th>注册</th></tr></thead>
-<tbody id="table-body"><tr><td colspan="6" style="text-align:center;color:#64748b">加载中...</td></tr></tbody>
-</table>
-</div>
-<p class="updated" id="update-time"></p>
-</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <span class="logo">TOKEN<span>TRANSIT</span></span>
+    <span class="status-dot" id="status-dot"></span>
+  </div>
+  <nav class="nav" id="nav">
+    <button class="nav-btn active" data-tab="monitor">监控</button>
+    <button class="nav-btn" data-tab="pricing">比价</button>
+    <button class="nav-btn" data-tab="guide">接入指南</button>
+    <button class="nav-btn" data-tab="faq">FAQ</button>
+  </nav>
+  <div class="header-right">
+    <span class="live-time" id="live-time">LIVE --:--:-- CST</span>
+  </div>
+</header>
+
+<main class="main">
+
+<!-- ========== MONITOR TAB ========== -->
+<section class="section active" id="tab-monitor">
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-label">监控站点</div>
+      <div class="stat-value blue" id="stat-total">7</div>
+      <div class="stat-sub">个中转站实时检测</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">当前在线</div>
+      <div class="stat-value green" id="stat-online">0</div>
+      <div class="stat-sub" id="stat-online-pct">--</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">平均延迟</div>
+      <div class="stat-value amber" id="stat-latency">--</div>
+      <div class="stat-sub" id="stat-latency-sub">--</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">活跃告警</div>
+      <div class="stat-value red" id="stat-alerts">0</div>
+      <div class="stat-sub" id="stat-alerts-sub">--</div>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <div class="alert-bar" id="alert-bar"></div>
+
+  <!-- Station Table -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">实时状态</span>
+      <span class="card-badge" id="table-updated">UPDATED --</span>
+    </div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>站点</th>
+          <th>风险</th>
+          <th>状态</th>
+          <th>延迟</th>
+          <th>可用率 24h</th>
+          <th>节点</th>
+          <th>GPT-4o 输入</th>
+          <th>接入</th>
+        </tr>
+      </thead>
+      <tbody id="monitor-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========== PRICING TAB ========== -->
+<section class="section" id="tab-pricing">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">GPT-4o 价格对比</span>
+      <span class="card-badge">$/1M tokens</span>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="price-compare">
+      <thead><tr><th>站点</th><th>类型</th><th>输入</th><th>输出</th><th>vs 官方</th><th>支付方式</th><th>最低充值</th></tr></thead>
+      <tbody id="pricing-gpt4o-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Claude Opus 4 价格对比</span>
+      <span class="card-badge">$/1M tokens</span>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="price-compare">
+      <thead><tr><th>站点</th><th>类型</th><th>输入</th><th>输出</th><th>vs 官方</th><th>模型数</th><th>备注</th></tr></thead>
+      <tbody id="pricing-claude-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========== GUIDE TAB ========== -->
+<section class="section" id="tab-guide">
+  <div class="guide-grid">
+    <div class="guide-card">
+      <h3>01 / 快速接入</h3>
+      <p>只需改 2 行配置，不修改业务代码：</p>
+      <pre><code># 方式一：环境变量
+export OPENAI_BASE_URL="https://api.oaipro.com/v1"
+export OPENAI_API_KEY="sk-xxxxxxxx"
+
+# 方式二：SDK 参数
+client = OpenAI(
+  base_url="...",
+  api_key="sk-..."
+)</code></pre>
+    </div>
+    <div class="guide-card">
+      <h3>02 / 选站建议</h3>
+      <ul>
+        <li><strong>追求稳定</strong> → OpenRouter（300+ 模型，$1.3B 估值背书）</li>
+        <li><strong>国内低延迟</strong> → oaipro（香港节点，~80ms）</li>
+        <li><strong>需要开发票</strong> → YesCode（企业对公转账）</li>
+        <li><strong>最低成本</strong> → 国产模型直连（DeepSeek ¥1起）</li>
+        <li><strong>多模型聚合</strong> → Cubence（包月套餐划算）</li>
+      </ul>
+    </div>
+    <div class="guide-card">
+      <h3>03 / 安全须知</h3>
+      <ul>
+        <li>🟢 <strong>官转站</strong>：从官方渠道采购，安全等同直连</li>
+        <li>🟡 <strong>混合站</strong>：部分官转+部分灰产，可用但不建议大额充值</li>
+        <li>🔴 <strong>灰产站</strong>：逆向账号/模型掉包，风险极高</li>
+        <li>单次充值 ≤ ¥200，不囤大额余额</li>
+        <li>至少维护 1 主 + 1 备两个站</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FAQ TAB ========== -->
+<section class="section" id="tab-faq">
+  <div class="card">
+    <div class="card-header"><span class="card-title">常见问题</span></div>
+    <div class="faq-list" style="padding:0 20px">
+      <div class="faq-item">
+        <div class="faq-q">用中转站会被 OpenAI 封号吗？</div>
+        <div class="faq-a">正规官转站（OpenRouter/YesCode/oaipro）从 OpenAI 官方渠道采购 API，和你直连完全一样。OpenAI 封的是违反 ToS 的行为（非支持地区直连 + 逆向账号），不是正常 API 调用。判断依据：你拿到的是 sk- 开头的 Key → 官转。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">为什么中转站比官方还便宜？</div>
+        <div class="faq-a">正规站的便宜来自批量采购折扣、Prompt 缓存套利（重复 System Prompt 官方半价）、Batch API 套利（非紧急请求打包走 Batch，官方 5 折）。如果价格低到官方 0.3 折以下，大概率是逆向账号拼车或模型掉包。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">哪个站延迟最低？</div>
+        <div class="faq-a">一般规律：香港节点（30-80ms）< 日本/新加坡（60-150ms）< 美国（200-400ms）。本站推荐：oaipro（香港，~80ms）、YesCode（日本，~120ms）、OpenRouter（美国，~250ms 但最稳定）。实际延迟和你本地网络有关，建议各站都试一下。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">怎么确认中转站返回的是真模型？</div>
+        <div class="faq-a">用 hvoy.ai 在线验证，或手动测试：1) 问"用中文重复我说的话"→ Qwen 会逐字重复，Claude 会先理解再转述；2) 写代码任务 → Claude Opus 的代码质量明显更高。本站评测表标注了每家站的模型真伪状态，定期用 hvoy.ai 批量检测。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">充了钱中转站跑路了怎么办？</div>
+        <div class="faq-a">降低风险：1) 单次充值 ≤ ¥200；2) 用光再充，不因优惠充年卡；3) 1 主 + 2 备，不依赖一家；4) 运营 < 6 个月的站跑路概率最高。本站不卖 Token，只提供中立评测。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">用中转站能用 Claude 吗？</div>
+        <div class="faq-a">目前官转站仍可用（通过海外实体采购）。但 Anthropic 反制力度在加强（2025.9 对中国企业断供，2026.4 收紧订阅政策）。兜底：DeepSeek V4 性能接近 Claude，¥3-6/百万 Token；通义千问 Qwen3.6 免费额度充裕。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <p>TOKEN TRANSIT — AI API 中转站实时比价监控</p>
+  <p>数据每 10 分钟自动刷新 | 本站不卖 Token，仅提供中立评测 | 数据仅供参考，使用前请自行验证</p>
+  <p>Powered by <a href="https://github.com/songquanpeng/one-api" target="_blank">one-api</a> ecosystem |
+  评测工具: <a href="https://hvoy.ai" target="_blank">hvoy.ai</a> |
+  价格聚合: <a href="https://ot.nekro.ai/pricing" target="_blank">one-tracker</a></p>
+</footer>
+
 <script>
-async function loadData(){
-  try{
-    const r=await fetch('data/stations.json');
-    const d=await r.json();
-    const tbody=document.getElementById('table-body');
-    const alerts=document.getElementById('alerts');
+// ====== CONFIG DATA (embedded from config.yaml) ======
+const CONFIG = {
+  stations: [
+    {name:"OpenRouter",type:"官转",risk:"🟢",home_url:"https://openrouter.ai",affiliate_link:"",pricing:{gpt4o_input:2.64,gpt4o_output:10.55,claude_opus_input:16.80,claude_opus_output:84.00,note:"官方价+5.5%平台费"},payment:["信用卡","PayPal","USDT"],min_recharge:"$5",models_count:300,region:"美国"},
+    {name:"YesCode",type:"官转",risk:"🟢",home_url:"https://yescode.io",affiliate_link:"",pricing:{gpt4o_input:2.75,gpt4o_output:11.00,claude_opus_input:17.50,claude_opus_output:87.50,note:"约官方1.1x，企业可开票"},payment:["微信","支付宝","对公转账"],min_recharge:"¥10",models_count:200,region:"日本"},
+    {name:"oaipro",type:"官转",risk:"🟢",home_url:"https://oaipro.com",affiliate_link:"",pricing:{gpt4o_input:2.75,gpt4o_output:11.00,claude_opus_input:17.50,claude_opus_output:87.50,note:"纯官转，口碑稳定"},payment:["微信","支付宝"],min_recharge:"¥10",models_count:150,region:"香港"},
+    {name:"Cubence",type:"官转",risk:"🟢",home_url:"https://cubence.com",affiliate_link:"",pricing:{gpt4o_input:2.80,gpt4o_output:11.20,claude_opus_input:18.00,claude_opus_output:90.00,note:"官转+包月套餐"},payment:["微信","支付宝","信用卡"],min_recharge:"¥20",models_count:180,region:"新加坡"},
+    {name:"Duck Code",type:"混合",risk:"🟡",home_url:"https://duckcode.com",affiliate_link:"",pricing:{gpt4o_input:2.00,gpt4o_output:8.00,claude_opus_input:12.00,claude_opus_output:60.00,note:"按量口碑最佳"},payment:["微信","支付宝"],min_recharge:"¥10",models_count:120,region:"日本"},
+    {name:"PackyCode",type:"混合",risk:"🟡",home_url:"https://packycode.com",affiliate_link:"",pricing:{gpt4o_input:1.80,gpt4o_output:7.20,claude_opus_input:10.50,claude_opus_output:52.50,note:"技术力口碑第一"},payment:["微信","支付宝"],min_recharge:"¥10",models_count:100,region:"香港"},
+    {name:"Privnode",type:"混合",risk:"🟡",home_url:"https://privnode.com",affiliate_link:"",pricing:{gpt4o_input:1.00,gpt4o_output:4.00,claude_opus_input:6.00,claude_opus_output:30.00,note:"价格最低，稳定性待验证"},payment:["微信","USDT"],min_recharge:"¥5",models_count:80,region:"未知"}
+  ]
+};
+const OFFICIAL_PRICE = {gpt4o_input:2.50,gpt4o_output:10.00,claude_opus_input:15.00,claude_opus_output:75.00};
+const configMap = new Map(CONFIG.stations.map(s => [s.name, s]));
 
-    // 告警
-    if(d.alerts&&d.alerts.length>0){
-      alerts.innerHTML=d.alerts.map(a=>`<div class="alert-box">⚠️ ${a}</div>`).join('');
-    }else{
-      alerts.innerHTML='';
-    }
+// ====== STATE ======
+let monitorData = null;
+let historyData = {};
 
-    // 表格
-    tbody.innerHTML=d.stations.map(s=>{
-      let statusCls=s.status==='在线'?'status-online':(s.status.includes('超时')?'status-warn':'status-offline');
-      let statusEmoji=s.status==='在线'?'🟢':(s.status.includes('超时')?'🟡':'🔴');
-      let delay=s.delay_ms?s.delay_ms+'ms':'-';
-      let delayCls=s.delay_ms?(s.delay_ms<1000?'latency-good':(s.delay_ms<3000?'latency-warn':'latency-bad')):'';
-      let time=s.time?s.time.replace('T',' ').substring(0,19):'-';
-      let link=s.affiliate_link?`<a href="${s.affiliate_link}" target="_blank">注册→</a>`:'-';
-      return `<tr>
-        <td><strong>${statusEmoji} ${s.name}</strong></td>
-        <td>${s.type||''}</td>
-        <td class="${statusCls}">${s.status}</td>
-        <td class="${delayCls}">${delay}</td>
-        <td>${time}</td>
-        <td>${link}</td>
-      </tr>`;
-    }).join('');
+// ====== TAB SWITCHING ======
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
 
-    document.getElementById('update-time').textContent='最后更新: '+d.updated_at.replace('T',' ').substring(0,19)+' | 数据每10分钟自动刷新';
-  }catch(e){
-    document.getElementById('table-body').innerHTML='<tr><td colspan="6" style="text-align:center;color:#f87171">数据加载失败，请稍后刷新</td></tr>';
+// ====== FAQ TOGGLE ======
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => q.parentElement.classList.toggle('open'));
+});
+
+// ====== LOAD MONITOR DATA ======
+async function loadMonitor() {
+  try {
+    const r = await fetch('data/stations.json?' + Date.now());
+    monitorData = await r.json();
+  } catch(e) {
+    console.warn('Monitor data not available, using config only');
+    monitorData = null;
+  }
+  try {
+    const r2 = await fetch('data/history.json?' + Date.now());
+    historyData = await r2.json();
+  } catch(e) {
+    historyData = {};
   }
 }
-loadData();
-setInterval(loadData,600000); // 每10分钟刷新
+
+function getMonitorStatus(name) {
+  if (!monitorData) return null;
+  return monitorData.stations.find(s => s.name === name) || null;
+}
+
+function getUptime24h(name) {
+  const recs = historyData[name] || [];
+  if (recs.length === 0) return null;
+  const online = recs.filter(r => r.status === '在线').length;
+  return Math.round(online / recs.length * 100);
+}
+
+function statusClass(status) {
+  if (!status) return 'warn';
+  if (status === '在线') return 'online';
+  if (status.includes('超时')) return 'warn';
+  return 'offline';
+}
+
+function latencyClass(ms) {
+  if (!ms) return '';
+  if (ms < 1000) return 'good';
+  if (ms < 3000) return 'warn';
+  return 'bad';
+}
+
+// ====== RENDER MONITOR TAB ======
+function renderMonitor() {
+  const tbody = document.getElementById('monitor-tbody');
+  const alertBar = document.getElementById('alert-bar');
+  let onlineCount = 0, totalLatency = 0, latencyCount = 0;
+
+  // Alerts
+  if (monitorData && monitorData.alerts && monitorData.alerts.length > 0) {
+    alertBar.innerHTML = monitorData.alerts.map(a => {
+      const isCrit = a.startsWith('🔴');
+      return `<div class="alert-item ${isCrit?'crit':'warn'}">${isCrit?'■':'◆'} ${a}</div>`;
+    }).join('');
+  } else {
+    alertBar.innerHTML = '';
+  }
+
+  // Table
+  tbody.innerHTML = CONFIG.stations.map(s => {
+    const ms = getMonitorStatus(s.name);
+    const status = ms ? ms.status : '未检测';
+    const delay = ms ? ms.delay_ms : null;
+    const uptime = getUptime24h(s.name);
+    const stCls = statusClass(status);
+    const ltCls = latencyClass(delay);
+
+    if (status === '在线') onlineCount++;
+    if (delay) { totalLatency += delay; latencyCount++; }
+
+    const uptimeStr = uptime !== null ? `${uptime}%` : '--';
+    const uptimeColor = uptime !== null ? (uptime >= 99 ? 'var(--accent-green)' : uptime >= 95 ? 'var(--accent-amber)' : 'var(--accent-red)') : 'var(--text-muted)';
+
+    const price = s.pricing;
+    const typeTagClass = s.type === '官转' ? 'green' : 'amber';
+
+    return `<tr>
+      <td>
+        <div class="station-name">
+          <span class="name">${s.name}</span>
+          <span class="type-tag ${typeTagClass}">${s.type}</span>
+        </div>
+      </td>
+      <td><span class="risk-badge">${s.risk}</span></td>
+      <td>
+        <span class="status-badge ${stCls}">
+          <span class="status-indicator ${stCls}"></span>
+          ${status}
+        </span>
+      </td>
+      <td><span class="latency ${ltCls}">${delay ? delay+'ms' : '--'}</span></td>
+      <td style="font-family:var(--font-mono);color:${uptimeColor}">${uptimeStr}</td>
+      <td style="font-size:0.78rem;color:var(--text-secondary)">${s.region}</td>
+      <td>
+        <div class="price">$${price.gpt4o_input}<span class="price-label"> / $${price.gpt4o_output}</span></div>
+      </td>
+      <td>
+        <a href="${s.home_url}" target="_blank" class="btn-link" rel="nofollow">注册 →</a>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Stats
+  document.getElementById('stat-online').textContent = onlineCount;
+  document.getElementById('stat-online-pct').textContent = `${Math.round(onlineCount/CONFIG.stations.length*100)}% 可用`;
+  document.getElementById('stat-alerts').textContent = monitorData ? monitorData.alerts.length : 0;
+  document.getElementById('stat-alerts-sub').textContent = monitorData && monitorData.alerts.length > 0 ? '需关注' : '无异常';
+
+  const avgLat = latencyCount > 0 ? Math.round(totalLatency / latencyCount) : null;
+  document.getElementById('stat-latency').textContent = avgLat ? `${avgLat}ms` : '--';
+  document.getElementById('stat-latency-sub').textContent = avgLat ? (avgLat < 1000 ? '良好' : avgLat < 3000 ? '偏高' : '严重') : '--';
+
+  // Status dot
+  const dot = document.getElementById('status-dot');
+  dot.className = 'status-dot';
+  if (onlineCount === CONFIG.stations.length) dot.classList.add('online');
+  else if (onlineCount >= CONFIG.stations.length / 2) dot.classList.add('warn');
+  else dot.classList.add('crit');
+
+  // Updated time
+  if (monitorData) {
+    document.getElementById('table-updated').textContent = 'UPDATED ' + monitorData.updated_at.replace('T',' ').substring(0,19);
+  }
+}
+
+// ====== RENDER PRICING TAB ======
+function renderPricing() {
+  // GPT-4o
+  document.getElementById('pricing-gpt4o-tbody').innerHTML = CONFIG.stations.map(s => {
+    const p = s.pricing;
+    const vsOfficial = Math.round((p.gpt4o_input / OFFICIAL_PRICE.gpt4o_input - 1) * 100);
+    const vsStr = vsOfficial > 0 ? `+${vsOfficial}%` : `${vsOfficial}%`;
+    const priceClass = vsOfficial <= 10 ? 'best-price' : 'price-high';
+    return `<tr>
+      <td class="model-name">${s.name} <span class="type-tag ${s.type==='官转'?'green':'amber'}">${s.type}</span></td>
+      <td><span>${s.risk}</span></td>
+      <td class="price-cell ${priceClass}">$${p.gpt4o_input}</td>
+      <td class="price-cell ${priceClass}">$${p.gpt4o_output}</td>
+      <td style="font-family:var(--font-mono);color:${vsOfficial>15?'var(--accent-amber)':'var(--accent-green)'}">${vsStr}</td>
+      <td style="font-size:0.75rem">${s.payment.join(' / ')}</td>
+      <td style="font-family:var(--font-mono)">${s.min_recharge}</td>
+    </tr>`;
+  }).join('');
+
+  // Claude Opus
+  document.getElementById('pricing-claude-tbody').innerHTML = CONFIG.stations.map(s => {
+    const p = s.pricing;
+    const vsOfficial = Math.round((p.claude_opus_input / OFFICIAL_PRICE.claude_opus_input - 1) * 100);
+    const vsStr = vsOfficial > 0 ? `+${vsOfficial}%` : `${vsOfficial}%`;
+    return `<tr>
+      <td class="model-name">${s.name}</td>
+      <td><span>${s.risk}</span></td>
+      <td class="price-cell">$${p.claude_opus_input}</td>
+      <td class="price-cell">$${p.claude_opus_output}</td>
+      <td style="font-family:var(--font-mono);color:${vsOfficial>15?'var(--accent-amber)':'var(--accent-green)'}">${vsStr}</td>
+      <td style="font-family:var(--font-mono)">${s.models_count}</td>
+      <td style="font-size:0.75rem;color:var(--text-secondary)">${p.note}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ====== UPDATE CLOCK ======
+function updateClock() {
+  const now = new Date();
+  document.getElementById('live-time').textContent =
+    'LIVE ' + now.toTimeString().substring(0,8) + ' CST';
+}
+
+// ====== MAIN ======
+async function refresh() {
+  await loadMonitor();
+  renderMonitor();
+  renderPricing();
+  updateClock();
+}
+
+refresh();
+setInterval(refresh, 600000); // 每10分钟刷新
+setInterval(updateClock, 1000);
 </script>
 </body>
 </html>
