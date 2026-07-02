@@ -95,6 +95,14 @@
       "delay_ms": 2303,
       "error": null,
       "time": "2026-07-03T06:33:02.733309+08:00"
+    },
+    {
+      "name": "OpenRouter",
+      "type": "官转",
+      "status": "在线",
+      "delay_ms": 134,
+      "error": null,
+      "time": "2026-07-03T07:41:07.384341+08:00"
     }
   ],
   "YesCode": [
@@ -193,6 +201,14 @@
       "delay_ms": null,
       "error": "连接失败",
       "time": "2026-07-03T06:33:02.810951+08:00"
+    },
+    {
+      "name": "YesCode",
+      "type": "官转",
+      "status": "不可达",
+      "delay_ms": null,
+      "error": "连接失败",
+      "time": "2026-07-03T07:41:07.448932+08:00"
     }
   ],
   "oaipro": [
@@ -291,6 +307,14 @@
       "delay_ms": 151,
       "error": "HTTP 401",
       "time": "2026-07-03T06:33:02.962533+08:00"
+    },
+    {
+      "name": "oaipro",
+      "type": "官转",
+      "status": "异常(401)",
+      "delay_ms": 102,
+      "error": "HTTP 401",
+      "time": "2026-07-03T07:41:07.552025+08:00"
     }
   ],
   "Duck Code": [
@@ -389,6 +413,14 @@
       "delay_ms": null,
       "error": "连接失败",
       "time": "2026-07-03T06:33:03.231811+08:00"
+    },
+    {
+      "name": "Duck Code",
+      "type": "混合",
+      "status": "不可达",
+      "delay_ms": null,
+      "error": "连接失败",
+      "time": "2026-07-03T07:41:07.723497+08:00"
     }
   ],
   "PackyCode": [
@@ -487,6 +519,14 @@
       "delay_ms": null,
       "error": "连接失败",
       "time": "2026-07-03T06:33:03.303725+08:00"
+    },
+    {
+      "name": "PackyCode",
+      "type": "混合",
+      "status": "不可达",
+      "delay_ms": null,
+      "error": "连接失败",
+      "time": "2026-07-03T07:41:07.757552+08:00"
     }
   ],
   "Privnode": [
@@ -585,6 +625,14 @@
       "delay_ms": null,
       "error": "连接失败",
       "time": "2026-07-03T06:33:03.367072+08:00"
+    },
+    {
+      "name": "Privnode",
+      "type": "混合",
+      "status": "不可达",
+      "delay_ms": null,
+      "error": "连接失败",
+      "time": "2026-07-03T07:41:07.786274+08:00"
     }
   ],
   "Cubence": [
@@ -683,6 +731,14 @@
       "delay_ms": 152,
       "error": "HTTP 401",
       "time": "2026-07-03T06:33:03.115677+08:00"
+    },
+    {
+      "name": "Cubence",
+      "type": "官转",
+      "status": "异常(401)",
+      "delay_ms": 108,
+      "error": "HTTP 401",
+      "time": "2026-07-03T07:41:07.660637+08:00"
     }
   ]
 }
