@@ -4,14 +4,6 @@
       "name": "OpenRouter",
       "type": "官转",
       "status": "在线",
-      "delay_ms": 63,
-      "error": null,
-      "time": "2026-08-23T01:32:40.086936+08:00"
-    },
-    {
-      "name": "OpenRouter",
-      "type": "官转",
-      "status": "在线",
       "delay_ms": 100,
       "error": null,
       "time": "2026-08-23T01:51:39.307657+08:00"
@@ -431,17 +423,17 @@
       "delay_ms": 82,
       "error": null,
       "time": "2026-08-24T01:28:38.322890+08:00"
+    },
+    {
+      "name": "OpenRouter",
+      "type": "官转",
+      "status": "在线",
+      "delay_ms": 85,
+      "error": null,
+      "time": "2026-08-24T01:44:27.220861+08:00"
     }
   ],
   "YesCode": [
-    {
-      "name": "YesCode",
-      "type": "官转",
-      "status": "不可达",
-      "delay_ms": null,
-      "error": "连接失败",
-      "time": "2026-08-23T01:32:40.278185+08:00"
-    },
     {
       "name": "YesCode",
       "type": "官转",
@@ -865,17 +857,17 @@
       "delay_ms": null,
       "error": "连接失败",
       "time": "2026-08-24T01:28:38.366499+08:00"
+    },
+    {
+      "name": "YesCode",
+      "type": "官转",
+      "status": "不可达",
+      "delay_ms": null,
+      "error": "连接失败",
+      "time": "2026-08-24T01:44:27.275117+08:00"
     }
   ],
   "oaipro": [
-    {
-      "name": "oaipro",
-      "type": "官转",
-      "status": "异常(401)",
-      "delay_ms": 345,
-      "error": "HTTP 401",
-      "time": "2026-08-23T01:32:40.624828+08:00"
-    },
     {
       "name": "oaipro",
       "type": "官转",
@@ -1299,17 +1291,17 @@
       "delay_ms": 362,
       "error": "HTTP 401",
       "time": "2026-08-24T01:28:38.730543+08:00"
+    },
+    {
+      "name": "oaipro",
+      "type": "官转",
+      "status": "异常(401)",
+      "delay_ms": 373,
+      "error": "HTTP 401",
+      "time": "2026-08-24T01:44:27.650594+08:00"
     }
   ],
   "Duck Code": [
-    {
-      "name": "Duck Code",
-      "type": "混合",
-      "status": "不可达",
-      "delay_ms": null,
-      "error": "连接失败",
-      "time": "2026-08-23T01:32:40.927706+08:00"
-    },
     {
       "name": "Duck Code",
       "type": "混合",
@@ -1733,17 +1725,17 @@
       "delay_ms": null,
       "error": "连接失败",
       "time": "2026-08-24T01:28:39.116392+08:00"
-    }
-  ],
-  "PackyCode": [
+    },
     {
-      "name": "PackyCode",
+      "name": "Duck Code",
       "type": "混合",
       "status": "不可达",
       "delay_ms": null,
       "error": "连接失败",
-      "time": "2026-08-23T01:32:41.024391+08:00"
-    },
+      "time": "2026-08-24T01:44:27.957640+08:00"
+    }
+  ],
+  "PackyCode": [
     {
       "name": "PackyCode",
       "type": "混合",
@@ -2167,17 +2159,17 @@
       "delay_ms": null,
       "error": "连接失败",
       "time": "2026-08-24T01:28:39.218425+08:00"
-    }
-  ],
-  "Privnode": [
+    },
     {
-      "name": "Privnode",
+      "name": "PackyCode",
       "type": "混合",
       "status": "不可达",
       "delay_ms": null,
       "error": "连接失败",
-      "time": "2026-08-23T01:32:41.076044+08:00"
-    },
+      "time": "2026-08-24T01:44:28.070385+08:00"
+    }
+  ],
+  "Privnode": [
     {
       "name": "Privnode",
       "type": "混合",
@@ -2601,17 +2593,17 @@
       "delay_ms": null,
       "error": "连接失败",
       "time": "2026-08-24T01:28:39.257357+08:00"
+    },
+    {
+      "name": "Privnode",
+      "type": "混合",
+      "status": "不可达",
+      "delay_ms": null,
+      "error": "连接失败",
+      "time": "2026-08-24T01:44:28.189400+08:00"
     }
   ],
   "Cubence": [
-    {
-      "name": "Cubence",
-      "type": "官转",
-      "status": "异常(401)",
-      "delay_ms": 193,
-      "error": "HTTP 401",
-      "time": "2026-08-23T01:32:40.820023+08:00"
-    },
     {
       "name": "Cubence",
       "type": "官转",
@@ -3035,6 +3027,14 @@
       "delay_ms": 221,
       "error": "HTTP 401",
       "time": "2026-08-24T01:28:38.953185+08:00"
+    },
+    {
+      "name": "Cubence",
+      "type": "官转",
+      "status": "异常(401)",
+      "delay_ms": 201,
+      "error": "HTTP 401",
+      "time": "2026-08-24T01:44:27.853381+08:00"
     }
   ]
 }
